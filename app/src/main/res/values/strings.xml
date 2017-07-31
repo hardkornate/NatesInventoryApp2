@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Nates Inventory App</string>
+    <string name="empty_view_subtitle_text">Click the action button to add an item</string>
+    <string name="empty_view_title_text">THE STORE IS EMPTY!</string>
+    <string name="hint_item_name">  ITEM NAME</string>
+    <string name="hint_item_supplier_email">  SUPPLIER EMAIL</string>
+    <string name="hint_item_price">  ITEM PRICE</string>
+    <string name="hint_item_initial_quantity">  INITIAL QUANTITY</string>
+    <string name="add_item">ADD ITEM</string>
+    <string name="editor_activity_title_new_item">Add A New Item</string>
+    <string name="item_detail">ITEM DETAIL</string>
+    <string name="delete_item">DELETE ITEM</string>
+    <string name="current_quantity">Current Quantity</string>
+    <string name="zero">0</string>
+    <string name="order_item">ORDER MORE</string>
+    <string name="unsaved_changes_dialog_msg">You have unsaved changes</string>
+    <string name="discard">Would you like to discard your changes?</string>
+    <string name="keep_editing">Or would you like to keep editing?</string>
+    <string name="editor_insert_item_failed">Item add failed!</string>
+    <string name="editor_insert_item_successful">Item successfully added!</string>
+    <string name="sell_item">Sell 1</string>
+    <string name="subject">Please send another shipment</string>
+    <string name="emailBeginning">Hello, we have sold out last shipment and would like another order of</string>
+    <string name="emailEnding">. Please invoice us. If there will be any issues, please reply. Otherwise, we will assume the order is inbound.</string>
+</resources>

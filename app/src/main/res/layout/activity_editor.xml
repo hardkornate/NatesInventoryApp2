@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Layout for the editor -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_margin"
+    android:background="@android:color/holo_blue_dark"
+    tools:context=".EditorActivity">
+    <LinearLayout
+        android:id="@+id/edit_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_item"
+        android:textStyle="bold"
+        android:fontFamily="monospace"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@color/editorColorPrimary"
+        android:gravity="center_horizontal" />
+    </LinearLayout>
+
+        <!-- Input fields -->
+        <LinearLayout
+            android:layout_below="@+id/edit_title"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:padding="@dimen/activity_margin"
+            android:orientation="vertical">
+
+            <!-- Name field -->
+            <EditText
+                android:id="@+id/edit_item_name"
+                android:hint="@string/hint_item_name"
+                android:inputType="textCapWords"
+                style="@style/EditorFieldStyle" />
+
+            <!-- Supplier field -->
+            <EditText
+                android:id="@+id/edit_item_supplier_email"
+                android:hint="@string/hint_item_supplier_email"
+                android:inputType="textEmailAddress"
+                style="@style/EditorFieldStyle" />
+
+            <!-- Price field -->
+            <EditText
+                android:id="@+id/edit_item_price"
+                android:hint="@string/hint_item_price"
+                android:inputType="numberDecimal"
+                style="@style/EditorFieldStyle" />
+
+            <!-- Initial Quantity field -->
+            <EditText
+                android:id="@+id/edit_item_initial_quantity"
+                android:hint="@string/hint_item_initial_quantity"
+                android:inputType="textEmailAddress"
+                style="@style/EditorFieldStyle" />
+        </LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_control_point_white_48dp"
+        app:backgroundTint="@color/colorAccent" />
+    </RelativeLayout>
+

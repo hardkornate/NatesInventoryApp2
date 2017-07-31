@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Detail Layout -->
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_margin"
+    android:background="@android:color/holo_blue_dark"
+    tools:context=".DetailActivity">
+    <LinearLayout
+        android:id="@+id/detail_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/item_detail"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="@color/editorColorPrimary"
+            android:gravity="center_horizontal"
+            android:padding="@dimen/activity_margin"
+            />
+    </LinearLayout>
+
+    <!-- Detail fields -->
+    <LinearLayout
+        android:id="@+id/display_fields"
+        android:layout_below="@+id/detail_title"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical">
+
+        <!-- Name field -->
+        <TextView
+            android:id="@+id/display_item_name"
+            android:textAlignment="center"
+            style="@style/EditorFieldStyle"
+            android:padding="@dimen/activity_margin"/>
+
+        <!-- Supplier field -->
+        <TextView
+            android:id="@+id/display_supplier_email"
+            android:textAlignment="center"
+            style="@style/EditorFieldStyle"
+            android:padding="@dimen/activity_margin"/>
+
+        <!-- Price field -->
+        <TextView
+            android:id="@+id/display_item_price"
+            android:textAlignment="center"
+            style="@style/EditorFieldStyle"
+            android:padding="@dimen/activity_margin"/>
+
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_below="@id/display_fields"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_margin">
+        <!--increment button -->
+        <ImageButton
+            android:id="@+id/increment"
+            style="@android:style/Widget.Holo.Light.ImageButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@color/editorColorPrimary"
+            android:padding="@dimen/button_margin"
+            android:focusable="false"
+            android:src="@drawable/ic_control_point_white_48dp" />
+        <LinearLayout
+            android:id="@+id/display_item_quantity_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            <!-- Quantity field -->
+            <TextView
+                android:textAlignment="center"
+                android:text="@string/current_quantity"
+                style="@style/EditorFieldStyle"
+                android:padding="@dimen/activity_margin"/>
+            <!-- Quantity field -->
+            <TextView
+                android:id="@+id/display_item_quantity"
+                android:textAlignment="center"
+                style="@style/EditorFieldStyle"
+                android:padding="@dimen/activity_margin"/>
+            </LinearLayout>
+                <!--delete item button -->
+            <Button
+                android:id="@+id/order_item_button"
+                style="@android:style/Widget.Holo.Light.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/editorColorPrimary"
+                android:elevation="4dp"
+                android:padding="@dimen/button_margin"
+                android:focusable="false"
+                android:text="@string/order_item" />
+            <Button
+                android:id="@+id/delete_item_button"
+                style="@android:style/Widget.Holo.Light.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/editorColorPrimary"
+                android:elevation="4dp"
+                android:padding="@dimen/button_margin"
+                android:focusable="false"
+                android:text="@string/delete_item" />
+        </LinearLayout>
+        <!--decrement button -->
+        <ImageButton
+            android:id="@+id/decrement"
+            style="@android:style/Widget.Holo.Light.ImageButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_toEndOf="@id/display_item_quantity_layout"
+            android:backgroundTint="@color/editorColorPrimary"
+            android:padding="@dimen/button_margin"
+            android:focusable="false"
+            android:src="@drawable/ic_monetization_on_white_48dp" />
+
+    </RelativeLayout>
+</RelativeLayout>
