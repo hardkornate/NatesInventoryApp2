@@ -18,8 +18,17 @@
     <string name="keep_editing">Or would you like to keep editing?</string>
     <string name="editor_insert_item_failed">Item add failed!</string>
     <string name="editor_insert_item_successful">Item successfully added!</string>
-    <string name="sell_item">Sell 1</string>
+    <string name="sell_item">  Sell 1  </string>
     <string name="subject">Please send another shipment</string>
     <string name="emailBeginning">Hello, we have sold out last shipment and would like another order of</string>
     <string name="emailEnding">. Please invoice us. If there will be any issues, please reply. Otherwise, we will assume the order is inbound.</string>
+    <string name="no">NO</string>
+    <string name="yes">YES</string>
+    <string name="confirm_delete">Are you sure you want to delete this item?</string>
+    <string name="delete_failed">Item delete failed!</string>
+    <string name="delete_successful">Item successfully deleted.</string>
+    <string name="no_product"> no products available , all products sold </string>
+    <string name="action_select_picture">Pick your image.</string>
+    <string name="exception_image_load_failed">Unable to load image.</string>
+    <string name="exception_file_not_found">File not found.</string>
 </resources>

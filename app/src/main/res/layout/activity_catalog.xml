@@ -13,7 +13,11 @@
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/holo_blue_dark" />
+        android:background="@android:color/holo_blue_dark"
+        android:padding="@dimen/activity_margin"
+        android:orientation="vertical"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="@dimen/activity_margin"/>
 
     <!-- Empty view for the list -->
     <RelativeLayout
@@ -41,6 +45,7 @@
             android:textAppearance="?android:textAppearanceMedium"/>
 
         <TextView
+            android:id="@+id/empty_title_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/empty_title_text"
@@ -56,8 +61,8 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_control_point_white_48dp"
         app:backgroundTint="@color/colorAccent" />

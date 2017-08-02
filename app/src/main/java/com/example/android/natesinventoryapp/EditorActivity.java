@@ -7,48 +7,110 @@ package com.example.android.natesinventoryapp;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    /** Identifier for the item data loader */
+    public static final String LOG_TAG = InventoryEntry.class.getSimpleName();
+
+    /**
+     * Code for image request
+     */
+    private static final int IMAGE_REQUEST_CODE = 0;
+
+    /**
+     * Image state URI
+     */
+    private static final String STATE_IMAGE_URI = "STATE_IMAGE_URI";
+
+    /**
+     * Identifier for the item data loader
+     */
     private static final int EXISTING_ITEM_LOADER = 0;
 
-    /** Content URI for the existing item (null if it's a new item) */
-    private final Uri mCurrentItemUri;
+    /**
+     * Content URI for the existing item (null if it's a new item)
+     */
+    private Uri mCurrentItemUri;
 
-    /** EditText field to enter the items name */
+    /**
+     * EditText field to enter the items name
+     */
     private EditText mNameEditText;
 
-    /** EditText field to enter the items supplier */
+    /**
+     * EditText field to enter the items supplier
+     */
     private EditText mSupplierEditText;
 
-    /** EditText field to enter the items price */
+    /**
+     * EditText field to enter the items price
+     */
     private EditText mPriceEditText;
 
-    /** EditText field to enter the item quantity */
+    /**
+     * EditText field to enter the item quantity
+     */
     private EditText mQuantityEditText;
 
+    /**
+     * ImaveView for the Item Image
+     */
+    private ImageView mImageProduct;
 
-    /** Boolean flag that keeps track of whether the item has been edited (true) or not (false) */
+    /**
+     * URI for the product image
+     */
+    private Uri mImageUri;
+
+    /**
+     * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
+     */
     private boolean mItemHasChanged = false;
+
+    /**
+     * Button for adding image
+     */
+    private Button mButtonAddImage;
+
+    /**
+     * Path for the Image
+     */
+    private String imagePath;
+
+    /**
+     * Context for the activity
+     */
+    final Context mContext = this;
 
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
@@ -79,7 +141,19 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mSupplierEditText = (EditText) findViewById(R.id.edit_item_supplier_email);
         mPriceEditText = (EditText) findViewById(R.id.edit_item_price);
         mQuantityEditText = (EditText) findViewById(R.id.edit_item_initial_quantity);
+        mButtonAddImage = (Button) findViewById(R.id.add_image_button);
+        mImageProduct = (ImageView) findViewById(R.id.item_image);
 
+        if (mCurrentItemUri == null) {
+            mButtonAddImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    buttonImageClick();
+                }
+            });
+        } else {
+            mButtonAddImage.setVisibility(View.GONE);
+        }
         // Setup OnTouchListeners on all the input fields, so we can determine if the user
         // has touched or modified them. This will let us know if there are unsaved changes
         // or not, if the user tries to leave the editor without saving.
@@ -89,13 +163,52 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mQuantityEditText.setOnTouchListener(mTouchListener);
         // Setup FAB to open EditorActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab2);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new View.OnClickListener()
+
+        {
             @Override
-            public void onClick(View view) {
-               saveItem();
+            public void onClick (View view){
+                saveItem();
             }
         });
     }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState.containsKey(STATE_IMAGE_URI) &&
+                !savedInstanceState.getString(STATE_IMAGE_URI).equals("")) {
+            mImageUri = Uri.parse(savedInstanceState.getString(STATE_IMAGE_URI));
+
+            ViewTreeObserver viewTreeObserver = mImageProduct.getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    mImageProduct.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    mImageProduct.setImageBitmap(getBitmapFromUri(mImageUri, mContext, mImageProduct));
+                }
+            });
+        }
+    }
+
+
+    /**
+     * Method to select a picture from device's media storage
+     */
+    private void buttonImageClick() {
+        Intent intent = new Intent();
+
+        if (Build.VERSION.SDK_INT < 19) {
+            intent = new Intent(Intent.ACTION_GET_CONTENT);
+        } else {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.action_select_picture)), IMAGE_REQUEST_CODE);
+    }
+
     /**
      * Get user input from editor and save pet into database.
      */
@@ -124,11 +237,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, supplierString);
         values.put(InventoryEntry.COLUMN_ITEM_PRICE, priceString);
         values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, quantityString);
+        values.put(InventoryEntry.COLUMN_ITEM_IMAGE, imagePath);
        
-            Uri newUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
+            mCurrentItemUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
 
             // Show a toast message depending on whether or not the insertion was successful.
-            if (newUri == null) {
+            if (mCurrentItemUri == null) {
                 // If the new content URI is null, then there was an error with insertion.
                 Toast.makeText(this, getString(R.string.editor_insert_item_failed),
                         Toast.LENGTH_SHORT).show();
@@ -141,7 +255,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        if (mImageUri != null) {
+            outState.putString(STATE_IMAGE_URI, mImageUri.toString());
+        }
+    }
     /**
      * This method is called when the back button is pressed.
      */
@@ -201,12 +322,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             int supplierColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_SUPPLIER);
             int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_PRICE);
             int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_QUANTITY);
+            int imageColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_IMAGE);
 
             // Extract out the value from the Cursor for the given column index
             String name = cursor.getString(nameColumnIndex);
             String supplier = cursor.getString(supplierColumnIndex);
             Double price = cursor.getDouble(priceColumnIndex);
             int quantity = cursor.getInt(quantityColumnIndex);
+            String image = cursor.getString(imageColumnIndex);
 
             DecimalFormat dec = new DecimalFormat("$####.00");
             String mPrice = dec.format(price);
@@ -216,10 +339,60 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             mSupplierEditText.setText(supplier);
             mPriceEditText.setText(mPrice);
             mQuantityEditText.setText(mQuantity);
+
+            mImageProduct.setImageBitmap(getBitmapFromUri(Uri.parse(image), mContext, mImageProduct));
+            mImageUri = Uri.parse(image);
             }
         }
 
+    public static Bitmap getBitmapFromUri(Uri uri, Context context, ImageView imageView) {
 
+        if (uri == null || uri.toString().isEmpty())
+            return null;
+
+        // Get the dimensions of the View
+        int targetW = imageView.getWidth();
+        int targetH = imageView.getHeight();
+
+        InputStream input = null;
+        try {
+            input = context.getContentResolver().openInputStream(uri);
+
+            // Get the dimensions of the bitmap
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(input, null, bmOptions);
+            input.close();
+
+            int photoW = bmOptions.outWidth;
+            int photoH = bmOptions.outHeight;
+
+            // Determine how much to scale down the image
+            int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+
+            // Decode the image file into a Bitmap sized to fill the View
+            bmOptions.inJustDecodeBounds = false;
+            bmOptions.inSampleSize = scaleFactor;
+
+            input = context.getContentResolver().openInputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeStream(input, null, bmOptions);
+            input.close();
+            return bitmap;
+
+        } catch (FileNotFoundException fne) {
+            Log.e(LOG_TAG, context.getString(R.string.exception_file_not_found), fne);
+            return null;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, context.getString(R.string.exception_image_load_failed), e);
+            return null;
+        } finally {
+            try {
+                input.close();
+            } catch (IOException ioe) {
+
+            }
+        }
+    }
     @Override
     public void onLoaderReset(Loader loader) {
         mNameEditText.setText("");

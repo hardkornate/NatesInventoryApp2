@@ -23,12 +23,10 @@ import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEnt
 
 public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    /** Identifier for the inventory data loader */
     private static final int INVENTORY_LOADER = 0;
+    private InventoryCursorAdapter mCursorAdapter;
+    private View mEmptyStateView;
 
-    /** Adapter for the ListView */
-    InventoryCursorAdapter mCursorAdapter;
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,9 +88,9 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         // Create a ContentValues object where column names are the keys,
         // and item attributes are the values.
         ContentValues values = new ContentValues();
-        values.put(InventoryEntry.COLUMN_ITEM_NAME, "Nails");
-        values.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, "orders@acehardware.com");
-        values.put(InventoryEntry.COLUMN_ITEM_PRICE, 0.05);
+        values.put(InventoryEntry.COLUMN_ITEM_NAME, "Rubber chickens");
+        values.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, "orders@noveltygags.com");
+        values.put(InventoryEntry.COLUMN_ITEM_PRICE, 3.25);
         values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, 10);
 
         // Insert a new row for an item into the provider using the ContentResolver.
@@ -110,7 +108,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 InventoryEntry.COLUMN_ITEM_NAME,
                 InventoryEntry.COLUMN_ITEM_SUPPLIER,
                 InventoryEntry.COLUMN_ITEM_PRICE,
-                InventoryEntry.COLUMN_ITEM_QUANTITY
+                InventoryEntry.COLUMN_ITEM_QUANTITY,
+                InventoryEntry.COLUMN_ITEM_IMAGE
         };
         insertItem();
         // This loader will execute the ContentProvider's query method on a background thread

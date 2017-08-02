@@ -23,6 +23,7 @@ import static com.example.android.natesinventoryapp.R.id.item_sell_button;
 import static com.example.android.natesinventoryapp.R.id.name;
 import static com.example.android.natesinventoryapp.R.id.price;
 import static com.example.android.natesinventoryapp.R.id.quantity;
+import static com.example.android.natesinventoryapp.data.InventoryContract.DEC_FORMAT;
 import static com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry.COLUMN_ITEM_NAME;
 import static com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry.COLUMN_ITEM_PRICE;
 import static com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry.COLUMN_ITEM_QUANTITY;
@@ -31,8 +32,11 @@ import static com.example.android.natesinventoryapp.data.InventoryContract.Inven
 
 class InventoryCursorAdapter extends CursorAdapter {
 
-    public InventoryCursorAdapter(Context context, Cursor c) {
-        super(context, c, 0 /* flags */);
+    private static Context mContext;
+
+    public InventoryCursorAdapter(Context context, Cursor cursor) {
+        super(context, cursor, 0);
+        mContext = context;
     }
 
     @Override
@@ -72,7 +76,7 @@ class InventoryCursorAdapter extends CursorAdapter {
                     context.getContentResolver().update(uri, values, null, null);
 
                 } else{
-                    Toast.makeText(context," no products available , all product sold ",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,R.string.no_product,Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -80,7 +84,7 @@ class InventoryCursorAdapter extends CursorAdapter {
         // Update the TextViews with the attributes for the current item
         nameTextView.setText(itemName);
         String mQuantity = String.valueOf(itemQuantity);
-        DecimalFormat dec = new DecimalFormat("$####.00");
+        DecimalFormat dec = new DecimalFormat(DEC_FORMAT);
         String mPrice = dec.format(itemPrice);
         priceTextView.setText(mPrice);
         quantityTextView.setText(mQuantity);

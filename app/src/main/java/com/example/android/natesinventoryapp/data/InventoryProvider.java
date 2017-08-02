@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 import android.webkit.URLUtil;
+import com.example.android.natesinventoryapp.R;
 
 import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry;
 

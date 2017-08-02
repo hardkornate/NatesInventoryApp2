@@ -40,24 +40,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_image_white_48dp" />
-        </LinearLayout>
-        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
@@ -73,6 +55,7 @@
                 android:background="@android:color/holo_blue_bright"
                 android:paddingTop="@dimen/button_margin"
                 android:paddingBottom="@dimen/button_margin"
+                android:paddingEnd="100dp"
                 android:text="@string/sell_item"
                 android:textAlignment="gravity"
                 android:textColor="@color/colorAccent"
@@ -80,6 +63,4 @@
                 android:textStyle="bold"
                 android:focusable="false"/>
         </LinearLayout>
-
-    </LinearLayout>
 </LinearLayout>

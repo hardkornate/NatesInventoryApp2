@@ -28,6 +28,7 @@ public final class InventoryContract {
      */
     public static final String PATH_ITEMS = "inventory";
 
+    public static final java.lang.String DEC_FORMAT = "$####.00";
     /**
      * Inner class that defines constant values for the inventory database table.
      * Each entry in the table represents a single pet.
@@ -90,6 +91,13 @@ public final class InventoryContract {
          * Type: Integer
          */
         public final static String COLUMN_ITEM_QUANTITY = "quantity";
+
+        /**
+         * Image of the item.
+         * <p>
+         * Type: Image
+         */
+        public final static String COLUMN_ITEM_IMAGE = "image";
 
     }
 }
