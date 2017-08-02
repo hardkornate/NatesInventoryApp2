@@ -110,7 +110,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * Context for the activity
      */
-    final Context mContext = this;
+    private final Context mContext = this;
 
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
@@ -345,7 +345,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
         }
 
-    public static Bitmap getBitmapFromUri(Uri uri, Context context, ImageView imageView) {
+    private static Bitmap getBitmapFromUri(Uri uri, Context context, ImageView imageView) {
 
         if (uri == null || uri.toString().isEmpty())
             return null;

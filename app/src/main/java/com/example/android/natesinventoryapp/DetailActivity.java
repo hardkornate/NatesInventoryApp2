@@ -169,7 +169,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
-        public static Bitmap getBitmapFromUri(Uri uri, Context mContext, ImageView imageView){
+        private static Bitmap getBitmapFromUri(Uri uri, Context mContext, ImageView imageView){
 
             if (uri == null || uri.toString().isEmpty())
                 return null;
