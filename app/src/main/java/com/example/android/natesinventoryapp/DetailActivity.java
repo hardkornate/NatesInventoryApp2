@@ -1,6 +1,7 @@
 package com.example.android.natesinventoryapp;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,8 +14,12 @@ import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.LoaderManager;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -44,14 +49,19 @@ import static com.example.android.natesinventoryapp.data.InventoryContract.DEC_F
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int DETAIL_INVENTORY_LOADER = 0;
+    private static final String STATE_URI = "STATE_URI";
+    private static final int PICK_IMAGE_REQUEST = 0;
+    private static final int SEND_MAIL_REQUEST = 1;
+
     private Uri mCurrentItemUri;
 
-    private TextView nameTextView, supplierTextView, quantityTextView, priceTextView;
+    private TextView nameTextView, supplierTextView, quantityTextView, priceTextView, mTextView;
     private String mSupplierEmail = "test@gmail.com";
     private String mName = "Widget";
     private Button orderButton, deleteButton;
     private ImageButton incrementButton, decrementButton;
-    private ImageView mImageItem;
+    private ImageView mImageView;
+    private FloatingActionButton mFab;
 
     private Context mContext = this;
 
@@ -68,7 +78,15 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         deleteButton = (Button) findViewById(R.id.delete_item_button);
         incrementButton = (ImageButton) findViewById(R.id.increment);
         decrementButton = (ImageButton) findViewById(R.id.decrement);
-        mImageItem = (ImageView) findViewById(R.id.item_image);
+        mImageView = (ImageView) findViewById(R.id.image);
+
+        mFab = (FloatingActionButton) findViewById(R.id.fabDetail);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openImageSelector();
+            }
+        });
 
         Intent intent = getIntent();
         mCurrentItemUri = intent.getData();
@@ -125,14 +143,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             quantityTextView.setText(mQuantity);
 
             // Display image attached to the product
-            ViewTreeObserver viewTreeObserver = mImageItem.getViewTreeObserver();
-            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    mImageItem.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    mImageItem.setImageBitmap(getBitmapFromUri(Uri.parse(image), mContext, mImageItem));
-                }
-            });
+            if (image != null) {
+                Log.i(LOG_TAG, "Uri: " + mCurrentItemUri.toString());
+
+                mTextView.setText(mCurrentItemUri.toString());
+                mImageView.setImageBitmap(getBitmapFromUri(mCurrentItemUri, mContext, mImageView));
+            }
+            //mImageView.setImageBitmap(getBitmapFromUri(Uri.parse(image), mContext, mImageView));
 
             orderButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -168,8 +185,44 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
+    public void openImageSelector() {
+        Intent intent;
 
-        private static Bitmap getBitmapFromUri(Uri uri, Context mContext, ImageView imageView){
+        if (Build.VERSION.SDK_INT < 19) {
+            intent = new Intent(Intent.ACTION_GET_CONTENT);
+        } else {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        // The ACTION_OPEN_DOCUMENT intent was sent with the request code READ_REQUEST_CODE.
+        // If the request code seen here doesn't match, it's the response to some other intent,
+        // and the below code shouldn't run at all.
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            // The document selected by the user won't be returned in the intent.
+            // Instead, a URI to that document will be contained in the return intent
+            // provided to this method as a parameter.  Pull that uri using "resultData.getData()"
+
+            if (resultData != null) {
+                mCurrentItemUri = resultData.getData();
+                Log.i(LOG_TAG, "Uri: " + mCurrentItemUri.toString());
+
+                mTextView.setText(mCurrentItemUri.toString());
+                mImageView.setImageBitmap(getBitmapFromUri(mCurrentItemUri, mContext, mImageView));
+            }
+        } else if (requestCode == SEND_MAIL_REQUEST && resultCode == Activity.RESULT_OK) {
+
+        }
+    }
+
+        public static Bitmap getBitmapFromUri(Uri uri, Context mContext, ImageView imageView){
 
             if (uri == null || uri.toString().isEmpty())
                 return null;
@@ -210,8 +263,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 Log.e(LOG_TAG, mContext.getString(R.string.exception_image_load_failed), e);
                 return null;
             } finally {
-                try {
-                    input.close();
+                try {if(input != null){input.close();}
                 } catch (IOException ioe) {
 
                 }
@@ -219,6 +271,33 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
 
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mCurrentItemUri != null)
+            outState.putString(STATE_URI, mCurrentItemUri.toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState.containsKey(STATE_URI) &&
+                !savedInstanceState.getString(STATE_URI).equals("")) {
+            mCurrentItemUri = Uri.parse(savedInstanceState.getString(STATE_URI));
+            mTextView.setText(mCurrentItemUri.toString());
+
+            ViewTreeObserver viewTreeObserver = mImageView.getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    mImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    mImageView.setImageBitmap(getBitmapFromUri(mCurrentItemUri, mContext, mImageView));
+                }
+            });
+        }
+    }
 
 
     @Override
@@ -246,6 +325,44 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             startActivity(intent);
         }
         finish();
+    }
+
+    private void sendEmail() {
+        if (mCurrentItemUri != null) {
+            String subject = "URI Example";
+            String stream = "Hello! \n"
+                    + "Uri example" + ".\n"
+                    + "Uri: " + mCurrentItemUri.toString() + "\n";
+
+            Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                    .setStream(mCurrentItemUri)
+                    .setSubject(subject)
+                    .setText(stream)
+                    .getIntent();
+
+            // Provide read access
+            shareIntent.setData(mCurrentItemUri);
+            shareIntent.setType("message/rfc822");
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            if (Build.VERSION.SDK_INT < 21) {
+                shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            } else {
+                shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+            }
+
+
+            startActivityForResult(Intent.createChooser(shareIntent, "Share with"), SEND_MAIL_REQUEST);
+
+        } else {
+            Snackbar.make(mFab, "Image not selected", Snackbar.LENGTH_LONG)
+                    .setAction("Select", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            openImageSelector();
+                        }
+                    }).show();
+        }
     }
 
     /**

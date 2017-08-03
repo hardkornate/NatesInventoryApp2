@@ -85,7 +85,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * ImaveView for the Item Image
      */
-    private ImageView mImageProduct;
+    private ImageView mImageItem;
 
     /**
      * URI for the product image
@@ -142,7 +142,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mPriceEditText = (EditText) findViewById(R.id.edit_item_price);
         mQuantityEditText = (EditText) findViewById(R.id.edit_item_initial_quantity);
         mButtonAddImage = (Button) findViewById(R.id.add_image_button);
-        mImageProduct = (ImageView) findViewById(R.id.item_image);
+        mImageItem = (ImageView) findViewById(R.id.item_image);
 
         if (mCurrentItemUri == null) {
             mButtonAddImage.setOnClickListener(new View.OnClickListener() {
@@ -181,12 +181,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 !savedInstanceState.getString(STATE_IMAGE_URI).equals("")) {
             mImageUri = Uri.parse(savedInstanceState.getString(STATE_IMAGE_URI));
 
-            ViewTreeObserver viewTreeObserver = mImageProduct.getViewTreeObserver();
+            ViewTreeObserver viewTreeObserver = mImageItem.getViewTreeObserver();
             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    mImageProduct.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    mImageProduct.setImageBitmap(getBitmapFromUri(mImageUri, mContext, mImageProduct));
+                    mImageItem.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    mImageItem.setImageBitmap(getBitmapFromUri(mImageUri, mContext, mImageItem));
                 }
             });
         }
@@ -197,7 +197,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      * Method to select a picture from device's media storage
      */
     private void buttonImageClick() {
-        Intent intent = new Intent();
+        Intent intent;
 
         if (Build.VERSION.SDK_INT < 19) {
             intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -209,6 +209,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         startActivityForResult(Intent.createChooser(intent, getString(R.string.action_select_picture)), IMAGE_REQUEST_CODE);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK){
+            Uri targetUri = data.getData();
+            Bitmap bitmap;
+            try {
+                bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(targetUri));
+                mImageItem.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     /**
      * Get user input from editor and save pet into database.
      */
@@ -340,7 +356,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             mPriceEditText.setText(mPrice);
             mQuantityEditText.setText(mQuantity);
 
-            mImageProduct.setImageBitmap(getBitmapFromUri(Uri.parse(image), mContext, mImageProduct));
+            mImageItem.setImageBitmap(getBitmapFromUri(Uri.parse(image), mContext, mImageItem));
             mImageUri = Uri.parse(image);
             }
         }

@@ -16,7 +16,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 import android.webkit.URLUtil;
-import com.example.android.natesinventoryapp.R;
 
 import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry;
 
@@ -164,7 +163,11 @@ public class InventoryProvider extends ContentProvider {
             throw new IllegalArgumentException("Item requires valid quantity");
         }
 
-
+        // If the image is provided, check that it's greater than or equal to 0
+        int image = values.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANTITY);
+        if (image < 0) {
+            throw new IllegalArgumentException("Item requires valid quantity");
+        }
 
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
@@ -237,11 +240,21 @@ public class InventoryProvider extends ContentProvider {
             }
         }
 
+
         // If the quantity {@link InventoryEntry#COLUMN_ITEM_QUANTITY} key is present, check that it's greater than or equal to 0
         if (values.containsKey(InventoryEntry.COLUMN_ITEM_QUANTITY)) {
             Integer quantity = values.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANTITY);
             if (quantity != null && quantity < 0) {
                 throw new IllegalArgumentException("Item requires valid quantity");
+            }
+        }
+
+
+        // If the quantity {@link InventoryEntry#COLUMN_ITEM_QUANTITY} key is present, check that it's greater than or equal to 0
+        if (values.containsKey(InventoryEntry.COLUMN_ITEM_IMAGE)) {
+            Integer quantity = values.getAsInteger(InventoryEntry.COLUMN_ITEM_IMAGE);
+            if (quantity != null && quantity < 0) {
+                throw new IllegalArgumentException("Item requires valid image");
             }
         }
 

@@ -46,21 +46,21 @@
             android:layout_weight="1"
             android:orientation="horizontal">
 
-            <Button
+            <ImageButton
                 android:id="@+id/item_sell_button"
-                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:background="@android:color/holo_blue_bright"
-                android:paddingTop="@dimen/button_margin"
+                android:background="@android:drawable/ic_input_delete"
                 android:paddingBottom="@dimen/button_margin"
                 android:paddingEnd="100dp"
+                android:paddingTop="@dimen/button_margin"
                 android:text="@string/sell_item"
                 android:textAlignment="gravity"
                 android:textColor="@color/colorAccent"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:focusable="false"/>
+                android:focusable="false" />
         </LinearLayout>
 </LinearLayout>

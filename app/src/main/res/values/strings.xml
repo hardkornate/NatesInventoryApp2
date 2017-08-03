@@ -31,4 +31,5 @@
     <string name="action_select_picture">Pick your image.</string>
     <string name="exception_image_load_failed">Unable to load image.</string>
     <string name="exception_file_not_found">File not found.</string>
+    <string name="action_sendmail">Send Mail</string>
 </resources>

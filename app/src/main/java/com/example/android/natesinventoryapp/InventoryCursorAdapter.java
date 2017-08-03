@@ -8,22 +8,28 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CursorAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
 
+import static com.example.android.natesinventoryapp.DetailActivity.getBitmapFromUri;
 import static com.example.android.natesinventoryapp.R.id.item_sell_button;
 import static com.example.android.natesinventoryapp.R.id.name;
 import static com.example.android.natesinventoryapp.R.id.price;
 import static com.example.android.natesinventoryapp.R.id.quantity;
 import static com.example.android.natesinventoryapp.data.InventoryContract.DEC_FORMAT;
+import static com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry.COLUMN_ITEM_IMAGE;
 import static com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry.COLUMN_ITEM_NAME;
 import static com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry.COLUMN_ITEM_PRICE;
 import static com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry.COLUMN_ITEM_QUANTITY;
@@ -51,13 +57,14 @@ class InventoryCursorAdapter extends CursorAdapter {
         TextView nameTextView = (TextView) view.findViewById(name);
         TextView priceTextView = (TextView) view.findViewById(price);
         final TextView quantityTextView = (TextView) view.findViewById(quantity);
-        Button mIncreaseButton=(Button) view.findViewById(item_sell_button);
+        ImageButton mSellButton = (ImageButton) view.findViewById(item_sell_button);
 
 
         // Find the columns of item attributes that we're interested in
         int nameColumnIndex = cursor.getColumnIndex(COLUMN_ITEM_NAME);
         int priceColumnIndex = cursor.getColumnIndex(COLUMN_ITEM_PRICE);
         final int quantityColumnIndex = cursor.getColumnIndex(COLUMN_ITEM_QUANTITY);
+        int imageColumnIndex = cursor.getColumnIndex(COLUMN_ITEM_IMAGE);
         final Uri uri = ContentUris.withAppendedId(CONTENT_URI, cursor.getInt(cursor.getColumnIndexOrThrow(_ID)));
 
 
@@ -65,8 +72,9 @@ class InventoryCursorAdapter extends CursorAdapter {
         String itemName = cursor.getString(nameColumnIndex);
         Double itemPrice = cursor.getDouble(priceColumnIndex);
         final int itemQuantity = cursor.getInt(quantityColumnIndex);
-
-        mIncreaseButton.setOnClickListener(new View.OnClickListener() {
+        final String image = cursor.getString(imageColumnIndex);
+        Uri imageUri = Uri.withAppendedPath(uri, image);
+        mSellButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (itemQuantity > 0) {
@@ -88,5 +96,6 @@ class InventoryCursorAdapter extends CursorAdapter {
         String mPrice = dec.format(itemPrice);
         priceTextView.setText(mPrice);
         quantityTextView.setText(mQuantity);
+        mSellButton.setImageBitmap(getBitmapFromUri(imageUri, mContext, mSellButton));
     }
 }
