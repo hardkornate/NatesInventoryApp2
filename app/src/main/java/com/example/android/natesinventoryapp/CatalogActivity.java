@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -36,8 +35,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
 
         // Setup FAB to open EditorActivity
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -73,7 +72,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 // Form the content URI that represents the specific inventory that was clicked on,
                 // by appending the "id" (passed as input to this method) onto the
                 // {@link InventoryEntry#CONTENT_URI}.
-                // For example, the URI would be "content://com.example.android.inventorys/inventorys/2"
+                // For example, the URI would be "content://com.example.android.inventory/inventory/2"
                 // if the inventory with ID 2 was clicked on.
                 Uri currentInventoryUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id);
                 // Set the URI on the data field of the intent

@@ -89,7 +89,6 @@
             android:layout_height="108dp"
                 android:layout_gravity="center_vertical"
             android:background="@drawable/ic_insert_photo_white_48dp"
-            android:clickable="true"
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:text="@string/action_select_picture"
