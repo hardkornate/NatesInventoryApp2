@@ -8,22 +8,21 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CursorAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.natesinventoryapp.data.Utils;
+
 import java.text.DecimalFormat;
 
-import static com.example.android.natesinventoryapp.DetailActivity.getBitmapFromUri;
+import static com.example.android.natesinventoryapp.R.id.item_image;
 import static com.example.android.natesinventoryapp.R.id.item_sell_button;
 import static com.example.android.natesinventoryapp.R.id.name;
 import static com.example.android.natesinventoryapp.R.id.price;
@@ -38,10 +37,10 @@ import static com.example.android.natesinventoryapp.data.InventoryContract.Inven
 
 class InventoryCursorAdapter extends CursorAdapter {
 
-    private static Context mContext;
+    private final Context mContext;
 
-    public InventoryCursorAdapter(Context context, Cursor cursor) {
-        super(context, cursor, 0);
+    InventoryCursorAdapter(Context context) {
+        super(context, null, 0);
         mContext = context;
     }
 
@@ -57,7 +56,8 @@ class InventoryCursorAdapter extends CursorAdapter {
         TextView nameTextView = (TextView) view.findViewById(name);
         TextView priceTextView = (TextView) view.findViewById(price);
         final TextView quantityTextView = (TextView) view.findViewById(quantity);
-        ImageButton mSellButton = (ImageButton) view.findViewById(item_sell_button);
+        Button mSellButton = (Button) view.findViewById(item_sell_button);
+        ImageView itemImageView = (ImageView) view.findViewById(item_image);
 
 
         // Find the columns of item attributes that we're interested in
@@ -68,12 +68,11 @@ class InventoryCursorAdapter extends CursorAdapter {
         final Uri uri = ContentUris.withAppendedId(CONTENT_URI, cursor.getInt(cursor.getColumnIndexOrThrow(_ID)));
 
 
-        // Read the pet attributes from the Cursor for the current item
+        // Read the item attributes from the Cursor for the current item
         String itemName = cursor.getString(nameColumnIndex);
         Double itemPrice = cursor.getDouble(priceColumnIndex);
         final int itemQuantity = cursor.getInt(quantityColumnIndex);
-        final String image = cursor.getString(imageColumnIndex);
-        Uri imageUri = Uri.withAppendedPath(uri, image);
+        String image = cursor.getString(imageColumnIndex);
         mSellButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,6 +95,8 @@ class InventoryCursorAdapter extends CursorAdapter {
         String mPrice = dec.format(itemPrice);
         priceTextView.setText(mPrice);
         quantityTextView.setText(mQuantity);
-        mSellButton.setImageBitmap(getBitmapFromUri(imageUri, mContext, mSellButton));
+        if (image != null) {
+            itemImageView.setImageBitmap(Utils.getBitmapFromUri(Uri.parse(image), mContext, itemImageView));
+        }
     }
 }

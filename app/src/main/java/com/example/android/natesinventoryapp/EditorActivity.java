@@ -13,15 +13,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -31,11 +27,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry;
+import com.example.android.natesinventoryapp.data.Utils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.DecimalFormat;
+
+import static com.example.android.natesinventoryapp.data.Utils.getBitmapFromUri;
 
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -56,62 +52,42 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      * Identifier for the item data loader
      */
     private static final int EXISTING_ITEM_LOADER = 0;
-
-    /**
-     * Content URI for the existing item (null if it's a new item)
-     */
-    private Uri mCurrentItemUri;
-
-    /**
-     * EditText field to enter the items name
-     */
-    private EditText mNameEditText;
-
-    /**
-     * EditText field to enter the items supplier
-     */
-    private EditText mSupplierEditText;
-
-    /**
-     * EditText field to enter the items price
-     */
-    private EditText mPriceEditText;
-
-    /**
-     * EditText field to enter the item quantity
-     */
-    private EditText mQuantityEditText;
-
-    /**
-     * ImaveView for the Item Image
-     */
-    private ImageView mImageItem;
-
-    /**
-     * URI for the product image
-     */
-    private Uri mImageUri;
-
-    /**
-     * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
-     */
-    private boolean mItemHasChanged = false;
-
-    /**
-     * Button for adding image
-     */
-    private Button mButtonAddImage;
-
-    /**
-     * Path for the Image
-     */
-    private String imagePath;
-
     /**
      * Context for the activity
      */
     private final Context mContext = this;
-
+    /**
+     * Content URI for the existing item (null if it's a new item)
+     */
+    private Uri mCurrentItemUri;
+    /**
+     * EditText field to enter the items name
+     */
+    private EditText mNameEditText;
+    /**
+     * EditText field to enter the items supplier
+     */
+    private EditText mSupplierEditText;
+    /**
+     * EditText field to enter the items price
+     */
+    private EditText mPriceEditText;
+    /**
+     * EditText field to enter the item quantity
+     */
+    private EditText mQuantityEditText;
+    /**
+     * ImaveView for the Item Image
+     */
+    private ImageView mImageItem;
+    /**
+     * URI for the product image
+     */
+    private Uri mImageUri;
+    /**
+     * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
+     */
+    private boolean mItemHasChanged = false;
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
      * the view, and we change the mItemHasChanged boolean to true.
@@ -123,6 +99,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return false;
         }
     };
+    /**
+     * Button for adding image
+     */
+    private Button mButtonAddImage;
+    /**
+     * Path for the Image
+     */
+    private String imagePath;
 
     public EditorActivity() {
         mCurrentItemUri = null;
@@ -132,6 +116,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+
+        if (bundle != null) {
+            mCurrentItemUri = Uri.parse(bundle.getString("URI"));
+        }
 
         getLoaderManager().getLoader(EXISTING_ITEM_LOADER);
 
@@ -144,7 +135,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mButtonAddImage = (Button) findViewById(R.id.add_image_button);
         mImageItem = (ImageView) findViewById(R.id.item_image);
 
-        if (mCurrentItemUri == null) {
+        if (mImageUri == null) {
             mButtonAddImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -153,6 +144,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             });
         } else {
             mButtonAddImage.setVisibility(View.GONE);
+            mImageItem.setVisibility(View.VISIBLE);
         }
         // Setup OnTouchListeners on all the input fields, so we can determine if the user
         // has touched or modified them. This will let us know if there are unsaved changes
@@ -199,12 +191,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private void buttonImageClick() {
         Intent intent;
 
-        if (Build.VERSION.SDK_INT < 19) {
-            intent = new Intent(Intent.ACTION_GET_CONTENT);
-        } else {
-            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-        }
+        intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
         startActivityForResult(Intent.createChooser(intent, getString(R.string.action_select_picture)), IMAGE_REQUEST_CODE);
     }
@@ -214,13 +202,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK){
-            Uri targetUri = data.getData();
-            Bitmap bitmap;
+        if (requestCode == IMAGE_REQUEST_CODE && (resultCode == RESULT_OK)) {
             try {
-                bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(targetUri));
-                mImageItem.setImageBitmap(bitmap);
-            } catch (FileNotFoundException e) {
+                mImageUri = data.getData();
+                int takeFlags = data.getFlags();
+                takeFlags &= (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+                try {
+                    getContentResolver().takePersistableUriPermission(mImageUri, takeFlags);
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                }
+                mImageItem.setImageBitmap(Utils.getBitmapFromUri(mImageUri, mContext, mImageItem));
+                saveItem();
+
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -235,12 +231,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String supplierString = mSupplierEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().trim();
         String quantityString = mQuantityEditText.getText().toString().trim();
+        String mImagePath = mImageUri.toString().trim();
 
         // Check if this is supposed to be a new item
         // and check if all the fields in the editor are blank
         if (mCurrentItemUri == null &&
                 TextUtils.isEmpty(nameString) && TextUtils.isEmpty(supplierString) &&
-                TextUtils.isEmpty(priceString) && TextUtils.isEmpty(quantityString)) {
+                TextUtils.isEmpty(priceString) && TextUtils.isEmpty(quantityString) && mImageItem.getDrawable() == null) {
             // Since no fields were modified, we can return early without creating a new pet.
             // No need to create ContentValues and no need to do any ContentProvider operations.
             return;
@@ -253,7 +250,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, supplierString);
         values.put(InventoryEntry.COLUMN_ITEM_PRICE, priceString);
         values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, quantityString);
-        values.put(InventoryEntry.COLUMN_ITEM_IMAGE, imagePath);
+        values.put(InventoryEntry.COLUMN_ITEM_IMAGE, mImagePath);
        
             mCurrentItemUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
 
@@ -313,7 +310,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 InventoryEntry.COLUMN_ITEM_NAME,
                 InventoryEntry.COLUMN_ITEM_SUPPLIER,
                 InventoryEntry.COLUMN_ITEM_PRICE,
-                InventoryEntry.COLUMN_ITEM_QUANTITY };
+                InventoryEntry.COLUMN_ITEM_QUANTITY,
+                InventoryEntry.COLUMN_ITEM_IMAGE
+        };
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
@@ -356,65 +355,26 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             mPriceEditText.setText(mPrice);
             mQuantityEditText.setText(mQuantity);
 
-            mImageItem.setImageBitmap(getBitmapFromUri(Uri.parse(image), mContext, mImageItem));
-            mImageUri = Uri.parse(image);
-            }
-        }
-
-    private static Bitmap getBitmapFromUri(Uri uri, Context context, ImageView imageView) {
-
-        if (uri == null || uri.toString().isEmpty())
-            return null;
-
-        // Get the dimensions of the View
-        int targetW = imageView.getWidth();
-        int targetH = imageView.getHeight();
-
-        InputStream input = null;
-        try {
-            input = context.getContentResolver().openInputStream(uri);
-
-            // Get the dimensions of the bitmap
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            bmOptions.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(input, null, bmOptions);
-            input.close();
-
-            int photoW = bmOptions.outWidth;
-            int photoH = bmOptions.outHeight;
-
-            // Determine how much to scale down the image
-            int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-            // Decode the image file into a Bitmap sized to fill the View
-            bmOptions.inJustDecodeBounds = false;
-            bmOptions.inSampleSize = scaleFactor;
-
-            input = context.getContentResolver().openInputStream(uri);
-            Bitmap bitmap = BitmapFactory.decodeStream(input, null, bmOptions);
-            input.close();
-            return bitmap;
-
-        } catch (FileNotFoundException fne) {
-            Log.e(LOG_TAG, context.getString(R.string.exception_file_not_found), fne);
-            return null;
-        } catch (Exception e) {
-            Log.e(LOG_TAG, context.getString(R.string.exception_image_load_failed), e);
-            return null;
-        } finally {
-            try {
-                input.close();
-            } catch (IOException ioe) {
+            if (image != null) {
+                mImageUri = Uri.parse(image);
+                mImageItem.setImageBitmap(getBitmapFromUri(mImageUri, mContext, mImageItem));
 
             }
         }
     }
+
     @Override
     public void onLoaderReset(Loader loader) {
-        mNameEditText.setText("");
-        mSupplierEditText.setText("");
-        mPriceEditText.setText("");
-        mQuantityEditText.setText("");
+
+    }
+
+    @Override
+    public Intent getSupportParentActivityIntent() {
+        Intent intent = super.getSupportParentActivityIntent();
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
+        return intent;
     }
 
     private void showUnsavedChangesDialog(

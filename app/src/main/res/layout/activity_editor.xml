@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Layout for the editor -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="@dimen/activity_margin"
-    android:background="@android:color/holo_blue_dark"
     tools:context=".EditorActivity">
     <LinearLayout
         android:id="@+id/edit_title"
@@ -17,49 +16,49 @@
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/add_item"
-        android:textStyle="bold"
         android:fontFamily="monospace"
+        android:gravity="center_horizontal"
+        android:text="@string/add_item"
         android:textAppearance="?android:textAppearanceLarge"
         android:textColor="@color/editorColorPrimary"
-        android:gravity="center_horizontal" />
+        android:textStyle="bold" />
     </LinearLayout>
 
         <!-- Input fields -->
         <LinearLayout
-            android:layout_below="@+id/edit_title"
-            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:padding="@dimen/activity_margin"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/edit_title"
+            android:orientation="vertical"
+            android:padding="@dimen/activity_margin">
 
             <!-- Name field -->
             <EditText
                 android:id="@+id/edit_item_name"
+                style="@style/EditorFieldStyle"
                 android:hint="@string/hint_item_name"
-                android:inputType="textCapWords"
-                style="@style/EditorFieldStyle" />
+                android:inputType="textCapWords" />
 
             <!-- Supplier field -->
             <EditText
                 android:id="@+id/edit_item_supplier_email"
+                style="@style/EditorFieldStyle"
                 android:hint="@string/hint_item_supplier_email"
-                android:inputType="textEmailAddress"
-                style="@style/EditorFieldStyle" />
+                android:inputType="textEmailAddress" />
 
             <!-- Price field -->
             <EditText
                 android:id="@+id/edit_item_price"
+                style="@style/EditorFieldStyle"
                 android:hint="@string/hint_item_price"
-                android:inputType="numberDecimal"
-                style="@style/EditorFieldStyle" />
+                android:inputType="numberDecimal" />
 
             <!-- Initial Quantity field -->
             <EditText
                 android:id="@+id/edit_item_initial_quantity"
+                style="@style/EditorFieldStyle"
                 android:hint="@string/hint_item_initial_quantity"
-                android:inputType="textEmailAddress"
-                style="@style/EditorFieldStyle" />
+                android:inputType="textEmailAddress" />
 
             <ImageView
                 android:id="@+id/item_image"

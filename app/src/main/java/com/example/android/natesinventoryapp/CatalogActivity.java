@@ -14,16 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry;
-
-import static android.R.attr.drawable;
-import static android.R.attr.id;
-import static com.example.android.natesinventoryapp.R.drawable.ic_image_white_48dp;
 
 /**
  * Displays list of inventory items that were entered and stored in the app.
@@ -46,11 +39,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
-        mEmptyStateView = findViewById(R.id.empty_view);
-        mListview = (ListView)findViewById(R.id.list);
-        mListview.setEmptyView(mEmptyStateView);
-
         // Setup FAB to open EditorActivity
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -61,19 +49,24 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             }
         });
 
-
+        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
+        mEmptyStateView = findViewById(R.id.empty_view);
+        mListview = (ListView) findViewById(R.id.list);
+        mListview.setEmptyView(mEmptyStateView);
 
         // Setup an Adapter to create a list item for each row of inventory data in the Cursor.
         // There is no inventory data yet (until the loader finishes) so pass in null for the Cursor.
-        mCursorAdapter = new InventoryCursorAdapter(this, null);
+        mCursorAdapter = new InventoryCursorAdapter(this);
         mListview.setAdapter(mCursorAdapter);
-        mListview.setVisibility((mCursorAdapter.isEmpty())?View.GONE:View.VISIBLE);
-
+        mListview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        if (mCursorAdapter != null) {
+            mListview.setVisibility((mCursorAdapter.isEmpty()) ? View.GONE : View.VISIBLE);
+        }
         // Setup the item click listener
-        mListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        AdapterView.OnItemClickListener mDetailOnItemClickListener = new AdapterView.OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
                 // Create new intent to go to {@link DetailActivity}
                 Intent intent = new Intent(CatalogActivity.this, DetailActivity.class);
 
@@ -89,7 +82,9 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 // Launch the {@link EditorActivity} to display the data for the current inventory.
                 startActivity(intent);
             }
-        });
+        };
+
+        mListview.setOnItemClickListener(mDetailOnItemClickListener);
 
         // Kick off the loader
         getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
@@ -98,25 +93,23 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     @Override
     public void onContentChanged() {
         super.onContentChanged();
-
-        View empty = findViewById(R.id.empty_view);
-        ListView list = (ListView) findViewById(R.id.list);
-        list.setEmptyView(empty);
-        list.setVisibility((mCursorAdapter.isEmpty())?View.GONE:View.VISIBLE);
+        if (mCursorAdapter != null) {
+            mListview.setVisibility(mCursorAdapter.isEmpty() ? View.GONE : View.VISIBLE);
+        }
     }
 
     /**
-     * Helper method to insert hardcoded pet data into the database. For debugging purposes only.
+     * Helper method to insert hardcoded item data into the database. For debugging purposes only.
      */
     private void insertItem() {
         // Create a ContentValues object where column names are the keys,
         // and item attributes are the values.
         ContentValues values = new ContentValues();
-        values.put(InventoryEntry.COLUMN_ITEM_NAME, "Rubber chickens");
-        values.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, "orders@noveltygags.com");
-        values.put(InventoryEntry.COLUMN_ITEM_PRICE, 3.25);
-        values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, 10);
-        values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, ic_image_white_48dp);
+        values.put(InventoryEntry.COLUMN_ITEM_NAME, "test");
+        values.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, "noone@gmail.com");
+        values.put(InventoryEntry.COLUMN_ITEM_PRICE, 1.00);
+        values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, 0);
+        values.put(InventoryEntry.COLUMN_ITEM_IMAGE, R.drawable.ic_insert_photo_white_48dp);
 
         // Insert a new row for an item into the provider using the ContentResolver.
         // Use the {@link InventoryEntry#CONTENT_URI} to indicate that we want to insert
@@ -136,7 +129,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 InventoryEntry.COLUMN_ITEM_QUANTITY,
                 InventoryEntry.COLUMN_ITEM_IMAGE
         };
-        insertItem();
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
                 InventoryEntry.CONTENT_URI,   // Provider content URI to query
@@ -145,6 +137,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 null,                   // No selection arguments
                 null);                  // Default sort order
     }
+
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

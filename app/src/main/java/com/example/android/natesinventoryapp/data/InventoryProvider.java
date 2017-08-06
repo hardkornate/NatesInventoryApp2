@@ -64,6 +64,10 @@ public class InventoryProvider extends ContentProvider {
     /** Database helper object */
     private InventoryDbHelper mDbHelper;
 
+    private static boolean isValidEmail(CharSequence target) {
+        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches();
+    }
+
     @Override
     public boolean onCreate() {
         mDbHelper = new InventoryDbHelper(getContext());
@@ -128,10 +132,6 @@ public class InventoryProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Insertion is not supported for " + uri);
         }
-    }
-
-    private static boolean isValidEmail(CharSequence target) {
-        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches();
     }
 
     /**
@@ -211,7 +211,7 @@ public class InventoryProvider extends ContentProvider {
      * specified in the selection and selection arguments (which could be 0 or 1 or more inventory).
      * Return the number of rows that were successfully updated.
      */
-    private int updateInventory(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int updateInventory(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         // If the {@link InventoryEntry#COLUMN_ITEM_NAME} key is present,
         // check that the name value is not null.
         if (values.containsKey(InventoryEntry.COLUMN_ITEM_NAME)) {
@@ -226,17 +226,17 @@ public class InventoryProvider extends ContentProvider {
         if (values.containsKey(InventoryEntry.COLUMN_ITEM_SUPPLIER)) {
             String supplier = values.getAsString(InventoryEntry.COLUMN_ITEM_SUPPLIER);
             if (supplier == null || !URLUtil.isValidUrl(supplier) || !Patterns.WEB_URL.matcher(supplier).matches()){
-                throw new IllegalArgumentException("Inventory requires valid gender");
+                throw new IllegalArgumentException("Inventory requires valid supplier email");
             }
         }
 
         // If the {@link InventoryEntry#COLUMN_ITEM_PRICE} key is present,
         // check that the price value is valid.
         if (values.containsKey(InventoryEntry.COLUMN_ITEM_PRICE)) {
-            // Check that the weight is greater than or equal to 0 kg
+            // Check that the price is greater than 0
             Double price = values.getAsDouble(InventoryEntry.COLUMN_ITEM_PRICE);
             if (price != null && price < 0) {
-                throw new IllegalArgumentException("Inventory requires valid weight");
+                throw new IllegalArgumentException("Inventory requires valid price");
             }
         }
 
@@ -250,10 +250,10 @@ public class InventoryProvider extends ContentProvider {
         }
 
 
-        // If the quantity {@link InventoryEntry#COLUMN_ITEM_QUANTITY} key is present, check that it's greater than or equal to 0
+        // If the image {@link InventoryEntry#COLUMN_ITEM_IMAGE} key is present, check that it's not null.
         if (values.containsKey(InventoryEntry.COLUMN_ITEM_IMAGE)) {
-            Integer quantity = values.getAsInteger(InventoryEntry.COLUMN_ITEM_IMAGE);
-            if (quantity != null && quantity < 0) {
+            String image = values.getAsString(InventoryEntry.COLUMN_ITEM_IMAGE);
+            if (image == null) {
                 throw new IllegalArgumentException("Item requires valid image");
             }
         }

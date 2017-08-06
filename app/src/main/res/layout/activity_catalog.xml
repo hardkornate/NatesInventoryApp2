@@ -17,37 +17,33 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            android:elevation="13dp"
+            android:visibility="gone"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
-<!-- Layout for the list of items -->
-
-
-    <ListView
-        android:id="@+id/list"
+    <include
+        layout="@layout/content_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/holo_blue_dark"
-        android:padding="@dimen/activity_margin"
-        android:orientation="vertical"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="@dimen/activity_margin"/>
+        android:layout_height="wrap_content" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <!-- Empty view for the list -->
     <RelativeLayout
         android:id="@+id/empty_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true">
 
         <ImageView
             android:id="@+id/empty_store_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_empty_store"/>
+            android:src="@drawable/ic_empty_store" />
 
         <TextView
             android:id="@+id/empty_title_text"
@@ -58,10 +54,9 @@
             android:fontFamily="sans-serif-medium"
             android:paddingTop="16dp"
             android:text="@string/empty_view_title_text"
-            android:textAppearance="?android:textAppearanceMedium"/>
+            android:textAppearance="?android:textAppearanceMedium" />
 
         <TextView
-            android:id="@+id/empty_title_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/empty_title_text"
@@ -70,9 +65,22 @@
             android:paddingTop="8dp"
             android:text="@string/empty_view_subtitle_text"
             android:textAppearance="?android:textAppearanceSmall"
-            android:textColor="#A2AAB0"/>
+            android:textColor="#A2AAB0" />
     </RelativeLayout>
 
+        <!-- Layout for the list of items -->
+
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/holo_blue_dark"
+            android:dividerHeight="@dimen/activity_margin"
+            android:footerDividersEnabled="true"
+            android:headerDividersEnabled="true"
+            android:orientation="vertical"
+            android:padding="@dimen/activity_margin" />
+    </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -80,5 +88,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        android:fadingEdge="horizontal|vertical"
+        app:elevation="10dp"
+        app:rippleColor="@android:color/holo_green_dark"
         app:srcCompat="@drawable/ic_control_point_white_48dp" />
 </android.support.design.widget.CoordinatorLayout>

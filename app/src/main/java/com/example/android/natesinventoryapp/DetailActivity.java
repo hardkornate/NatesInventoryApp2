@@ -1,8 +1,8 @@
 package com.example.android.natesinventoryapp;
 
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -11,15 +11,9 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.app.LoaderManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -30,16 +24,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.DecimalFormat;
 
 import static com.example.android.natesinventoryapp.EditorActivity.LOG_TAG;
 import static com.example.android.natesinventoryapp.data.InventoryContract.DEC_FORMAT;
+import static com.example.android.natesinventoryapp.data.Utils.getBitmapFromUri;
 
 
 /**
@@ -50,20 +41,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     private static final int DETAIL_INVENTORY_LOADER = 0;
     private static final String STATE_URI = "STATE_URI";
-    private static final int PICK_IMAGE_REQUEST = 0;
     private static final int SEND_MAIL_REQUEST = 1;
-
+    private final Context mContext = this;
     private Uri mCurrentItemUri;
-
+    private Uri mImageUri;
     private TextView nameTextView, supplierTextView, quantityTextView, priceTextView, mTextView;
     private String mSupplierEmail = "test@gmail.com";
     private String mName = "Widget";
+    private String mItemUriString = null;
     private Button orderButton, deleteButton;
     private ImageButton incrementButton, decrementButton;
     private ImageView mImageView;
     private FloatingActionButton mFab;
-
-    private Context mContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,13 +67,17 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         deleteButton = (Button) findViewById(R.id.delete_item_button);
         incrementButton = (ImageButton) findViewById(R.id.increment);
         decrementButton = (ImageButton) findViewById(R.id.decrement);
-        mImageView = (ImageView) findViewById(R.id.image);
+        mTextView = (TextView) findViewById(R.id.image_uri);
+        mImageView = (ImageView) findViewById(R.id.detail_image);
 
         mFab = (FloatingActionButton) findViewById(R.id.fabDetail);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openImageSelector();
+                mItemUriString = mCurrentItemUri.toString();
+                Intent intent = new Intent(DetailActivity.this, EditorActivity.class);
+                intent.putExtra("URI", mItemUriString);
+                startActivity(intent);
             }
         });
 
@@ -131,7 +124,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             mSupplierEmail = cursor.getString(supplierColumnIndex);
             Double price = cursor.getDouble(priceColumnIndex);
             final int quantity = cursor.getInt(quantityColumnIndex);
-            final String image = cursor.getString(imageColumnIndex);
+            String mImage = cursor.getString(imageColumnIndex);
 
             DecimalFormat dec = new DecimalFormat(DEC_FORMAT);
             String mPrice = dec.format(price);
@@ -143,13 +136,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             quantityTextView.setText(mQuantity);
 
             // Display image attached to the product
-            if (image != null) {
-                Log.i(LOG_TAG, "Uri: " + mCurrentItemUri.toString());
-
-                mTextView.setText(mCurrentItemUri.toString());
-                mImageView.setImageBitmap(getBitmapFromUri(mCurrentItemUri, mContext, mImageView));
+            if (mImage != null) {
+                Log.i(LOG_TAG, "Uri: " + mImage);
+                mImageUri = Uri.parse(mImage);
+                mImageView.setImageBitmap(getBitmapFromUri(mImageUri, mContext, mImageView));
             }
-            //mImageView.setImageBitmap(getBitmapFromUri(Uri.parse(image), mContext, mImageView));
 
             orderButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -185,92 +176,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
-    public void openImageSelector() {
-        Intent intent;
-
-        if (Build.VERSION.SDK_INT < 19) {
-            intent = new Intent(Intent.ACTION_GET_CONTENT);
-        } else {
-            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-        }
-
-        intent.setType("image/*");
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        // The ACTION_OPEN_DOCUMENT intent was sent with the request code READ_REQUEST_CODE.
-        // If the request code seen here doesn't match, it's the response to some other intent,
-        // and the below code shouldn't run at all.
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-            // The document selected by the user won't be returned in the intent.
-            // Instead, a URI to that document will be contained in the return intent
-            // provided to this method as a parameter.  Pull that uri using "resultData.getData()"
-
-            if (resultData != null) {
-                mCurrentItemUri = resultData.getData();
-                Log.i(LOG_TAG, "Uri: " + mCurrentItemUri.toString());
-
-                mTextView.setText(mCurrentItemUri.toString());
-                mImageView.setImageBitmap(getBitmapFromUri(mCurrentItemUri, mContext, mImageView));
-            }
-        } else if (requestCode == SEND_MAIL_REQUEST && resultCode == Activity.RESULT_OK) {
-
-        }
-    }
-
-        public static Bitmap getBitmapFromUri(Uri uri, Context mContext, ImageView imageView){
-
-            if (uri == null || uri.toString().isEmpty())
-                return null;
-
-            // Get the dimensions of the View
-            int targetW = imageView.getWidth();
-            int targetH = imageView.getHeight();
-
-            InputStream input = null;
-            try {
-                input = mContext.getContentResolver().openInputStream(uri);
-
-                // Get the dimensions of the bitmap
-                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                bmOptions.inJustDecodeBounds = true;
-                BitmapFactory.decodeStream(input, null, bmOptions);
-                input.close();
-
-                int photoW = bmOptions.outWidth;
-                int photoH = bmOptions.outHeight;
-
-                // Determine how much to scale down the image
-                int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-                // Decode the image file into a Bitmap sized to fill the View
-                bmOptions.inJustDecodeBounds = false;
-                bmOptions.inSampleSize = scaleFactor;
-
-                input = mContext.getContentResolver().openInputStream(uri);
-                Bitmap bitmap = BitmapFactory.decodeStream(input, null, bmOptions);
-                input.close();
-                return bitmap;
-
-            } catch (FileNotFoundException fne) {
-                Log.e(LOG_TAG, mContext.getString(R.string.exception_image_load_failed), fne);
-                return null;
-            } catch (Exception e) {
-                Log.e(LOG_TAG, mContext.getString(R.string.exception_image_load_failed), e);
-                return null;
-            } finally {
-                try {if(input != null){input.close();}
-                } catch (IOException ioe) {
-
-                }
-            }
-        }
-
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -293,7 +198,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 @Override
                 public void onGlobalLayout() {
                     mImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    mImageView.setImageBitmap(getBitmapFromUri(mCurrentItemUri, mContext, mImageView));
+                    mImageView.setImageBitmap(getBitmapFromUri(mImageUri, mContext, mImageView));
                 }
             });
         }
@@ -305,15 +210,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     }
 
-    private int adjustInventory(Uri itemUri, int mQuantity) {
+    private void adjustInventory(Uri itemUri, int mQuantity) {
         if (mQuantity < 0) {
-            return 0;
+            mQuantity = 0;
         }
 
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, mQuantity);
-        int rowsUpdated = getContentResolver().update(itemUri, values, null, null);
-        return rowsUpdated;
+        getContentResolver().update(itemUri, values, null, null);
     }
 
     private void composeEmail(String subject, String body, String email) {
@@ -327,7 +231,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         finish();
     }
 
-    private void sendEmail() {
+    /**   private void sendEmail() {
         if (mCurrentItemUri != null) {
             String subject = "URI Example";
             String stream = "Hello! \n"
@@ -344,13 +248,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             shareIntent.setData(mCurrentItemUri);
             shareIntent.setType("message/rfc822");
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            if (Build.VERSION.SDK_INT < 21) {
-                shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-            } else {
-                shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-            }
-
+     shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
 
             startActivityForResult(Intent.createChooser(shareIntent, "Share with"), SEND_MAIL_REQUEST);
 
@@ -365,7 +263,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
-    /**
+
      * Method to ask confirmation for deleting a product
      */
     private void confirmDeleteItem() {
