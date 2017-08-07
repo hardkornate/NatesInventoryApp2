@@ -33,6 +33,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
+
         // Setup FAB to open EditorActivity
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -42,6 +43,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 startActivity(intent);
             }
         });
+
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         mEmptyStateView = findViewById(R.id.empty);
         mEmptyTextView = findViewById(R.id.empty_title_text);
@@ -51,6 +53,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         ViewGroup parentGroup = (ViewGroup) mListview.getParent();
         parentGroup.addView(mEmptyStateView);
         mListview.setEmptyView(mEmptyStateView);
+
         // Setup an Adapter to create a list item for each row of inventory data in the Cursor.
         // There is no inventory data yet (until the loader finishes) so pass in null for the Cursor.
         mCursorAdapter = new InventoryCursorAdapter(this);
@@ -60,12 +63,17 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             mListview.setVisibility((mCursorAdapter.isEmpty()) ? View.GONE : View.VISIBLE);
             mEmptyTextView.setVisibility((mCursorAdapter.isEmpty()) ? View.VISIBLE : View.GONE);
             mEmptySubTextView.setVisibility((mCursorAdapter.isEmpty()) ? View.VISIBLE : View.GONE);
+        } else {
+            mListview.setVisibility(View.GONE);
+            mEmptyTextView.setVisibility(View.VISIBLE);
+            mEmptySubTextView.setVisibility(View.VISIBLE);
         }
         // Setup the item click listener
         AdapterView.OnItemClickListener mDetailOnItemClickListener = new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
+
                 // Create new intent to go to {@link DetailActivity}
                 Intent intent = new Intent(CatalogActivity.this, DetailActivity.class);
 
@@ -75,6 +83,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 // For example, the URI would be "content://com.example.android.inventory/inventory/2"
                 // if the inventory with ID 2 was clicked on.
                 Uri currentInventoryUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id);
+
                 // Set the URI on the data field of the intent
                 intent.setData(currentInventoryUri);
 
@@ -98,6 +107,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
      * Helper method to insert hardcoded item data into the database. For debugging purposes only.
      */
     private void insertItem() {
+
         // Create a ContentValues object where column names are the keys,
         // and item attributes are the values.
         ContentValues values = new ContentValues();
@@ -116,6 +126,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+
         // Define a projection that specifies the columns from the table we care about.
         String[] projection = {
                 InventoryEntry._ID,
@@ -125,6 +136,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 InventoryEntry.COLUMN_ITEM_QUANTITY,
                 InventoryEntry.COLUMN_ITEM_IMAGE
         };
+
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
                 InventoryEntry.CONTENT_URI,   // Provider content URI to query
@@ -136,12 +148,23 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
         // Update {@link InventoryCursorAdapter} with this new cursor containing updated pet data
         mCursorAdapter.swapCursor(data);
+        if (mCursorAdapter != null) {
+            mListview.setVisibility((mCursorAdapter.isEmpty()) ? View.GONE : View.VISIBLE);
+            mEmptyTextView.setVisibility((mCursorAdapter.isEmpty()) ? View.VISIBLE : View.GONE);
+            mEmptySubTextView.setVisibility((mCursorAdapter.isEmpty()) ? View.VISIBLE : View.GONE);
+        } else {
+            mListview.setVisibility(View.GONE);
+            mEmptyTextView.setVisibility(View.VISIBLE);
+            mEmptySubTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+
         // Callback called when the data needs to be deleted
         mCursorAdapter.swapCursor(null);
     }

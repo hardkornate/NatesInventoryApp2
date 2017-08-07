@@ -41,11 +41,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     private static final int DETAIL_INVENTORY_LOADER = 0;
     private static final String STATE_URI = "STATE_URI";
-    private static final int SEND_MAIL_REQUEST = 1;
     private final Context mContext = this;
     private Uri mCurrentItemUri;
     private Uri mImageUri;
-    private TextView nameTextView, supplierTextView, quantityTextView, priceTextView, mTextView;
+    private TextView nameTextView, supplierTextView, quantityTextView, priceTextView;
     private String mSupplierEmail = "hardkornate@gmail.com";
     private String mName = "Widget";
     private String mItemUriString = null;
@@ -70,7 +69,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         deleteButton = (Button) findViewById(R.id.delete_item_button);
         incrementButton = (ImageButton) findViewById(R.id.increment);
         decrementButton = (ImageButton) findViewById(R.id.decrement);
-        mTextView = (TextView) findViewById(R.id.image_uri);
         mImageView = (ImageView) findViewById(R.id.detail_image);
 
         if (mCurrentItemUri != null) {
@@ -120,11 +118,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         if (cursor == null || cursor.getCount() < 1) {
             return;
         }
-
         // Proceed with moving to the first row of the cursor and reading data from it
         // (This should be the only row in the cursor)
         if (cursor.moveToFirst()) {
             DatabaseUtils.dumpCursor(cursor);
+
             // Find the columns of item attributes that we're interested in
             int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_NAME);
             int supplierColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_ITEM_SUPPLIER);
@@ -142,6 +140,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             DecimalFormat dec = new DecimalFormat(DEC_FORMAT);
             String mPrice = dec.format(price);
             String mQuantity = String.valueOf(quantity);
+
             // Update the views on the screen with the values from the database
             nameTextView.setText(mName);
             supplierTextView.setText(mSupplierEmail);
@@ -179,7 +178,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             orderButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    composeEmail(getString(R.string.subject) + " of " + mName, getString(R.string.emailBeginning) + mName + getString(R.string.emailEnding), mSupplierEmail);
+                    composeEmail(getString(R.string.subject) + " of " + mName, getString(R.string.emailBeginning) + " " + mName + getString(R.string.emailEnding), mSupplierEmail);
                 }
 
             });
@@ -222,8 +221,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         if (savedInstanceState.containsKey(STATE_URI) &&
                 !savedInstanceState.getString(STATE_URI).equals("")) {
-            mCurrentItemUri = Uri.parse(savedInstanceState.getString(STATE_URI));
-            mTextView.setText(mCurrentItemUri.toString());
 
             ViewTreeObserver viewTreeObserver = mImageView.getViewTreeObserver();
             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -244,7 +241,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         if (mQuantity < 0) {
             mQuantity = 0;
         }
-
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, mQuantity);
         getContentResolver().update(itemUri, values, null, null);

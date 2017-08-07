@@ -138,6 +138,7 @@ public class InventoryProvider extends ContentProvider {
      * for that specific row in the database.
      */
     private Uri insertItem(Uri uri, ContentValues values) {
+
         // Check that the name is not null
         String name = values.getAsString(InventoryEntry.COLUMN_ITEM_NAME);
         if (name == null) {
@@ -146,7 +147,7 @@ public class InventoryProvider extends ContentProvider {
 
         // If the supplier is provided, check that it's a valid URL
         String supplier = values.getAsString(InventoryEntry.COLUMN_ITEM_SUPPLIER);
-        if (!isValidEmail(supplier) || !Patterns.WEB_URL.matcher(supplier).matches()) {
+        if (!isValidEmail(supplier)) {
             throw new IllegalArgumentException("Supplier requires a valid email address");
         }
 
@@ -194,6 +195,7 @@ public class InventoryProvider extends ContentProvider {
             case ITEMS:
                 return updateInventory(uri, contentValues, selection, selectionArgs);
             case ITEM_ID:
+
                 // For the ITEM_ID code, extract out the ID from the URI,
                 // so we know which row to update. Selection will be "_id=?" and selection
                 // arguments will be a String array containing the actual ID.
@@ -211,6 +213,7 @@ public class InventoryProvider extends ContentProvider {
      * Return the number of rows that were successfully updated.
      */
     public int updateInventory(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+
         // If the {@link InventoryEntry#COLUMN_ITEM_NAME} key is present,
         // check that the name value is not null.
         if (values != null) {
@@ -280,6 +283,7 @@ public class InventoryProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
