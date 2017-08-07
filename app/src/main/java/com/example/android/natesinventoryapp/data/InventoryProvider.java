@@ -15,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
-import android.webkit.URLUtil;
 
 import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry;
 
@@ -65,7 +64,7 @@ public class InventoryProvider extends ContentProvider {
     private InventoryDbHelper mDbHelper;
 
     private static boolean isValidEmail(CharSequence target) {
-        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());
     }
 
     @Override
@@ -214,54 +213,54 @@ public class InventoryProvider extends ContentProvider {
     public int updateInventory(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         // If the {@link InventoryEntry#COLUMN_ITEM_NAME} key is present,
         // check that the name value is not null.
-        if (values.containsKey(InventoryEntry.COLUMN_ITEM_NAME)) {
-            String name = values.getAsString(InventoryEntry.COLUMN_ITEM_NAME);
-            if (name == null) {
-                throw new IllegalArgumentException("Item requires a name");
+        if (values != null) {
+            if (values.containsKey(InventoryEntry.COLUMN_ITEM_NAME)) {
+                String name = values.getAsString(InventoryEntry.COLUMN_ITEM_NAME);
+                if (name == null) {
+                    throw new IllegalArgumentException("Item requires a name");
+                }
             }
-        }
 
-        // If the {@link InventoryEntry#COLUMN_ITEM_SUPPLIER} key is present,
-        // check that the supplier url is valid.
-        if (values.containsKey(InventoryEntry.COLUMN_ITEM_SUPPLIER)) {
-            String supplier = values.getAsString(InventoryEntry.COLUMN_ITEM_SUPPLIER);
-            if (supplier == null || !URLUtil.isValidUrl(supplier) || !Patterns.WEB_URL.matcher(supplier).matches()){
-                throw new IllegalArgumentException("Inventory requires valid supplier email");
+            // If the {@link InventoryEntry#COLUMN_ITEM_SUPPLIER} key is present,
+            // check that the supplier url is valid.
+            if (values.containsKey(InventoryEntry.COLUMN_ITEM_SUPPLIER)) {
+                String supplier = values.getAsString(InventoryEntry.COLUMN_ITEM_SUPPLIER);
+                //  if (supplier == null || !URLUtil.isValidUrl(supplier) || !Patterns.WEB_URL.matcher(supplier).matches()) {
+                //      throw new IllegalArgumentException("Inventory requires valid supplier email");
+                //   }
             }
-        }
 
-        // If the {@link InventoryEntry#COLUMN_ITEM_PRICE} key is present,
-        // check that the price value is valid.
-        if (values.containsKey(InventoryEntry.COLUMN_ITEM_PRICE)) {
-            // Check that the price is greater than 0
-            Double price = values.getAsDouble(InventoryEntry.COLUMN_ITEM_PRICE);
-            if (price != null && price < 0) {
-                throw new IllegalArgumentException("Inventory requires valid price");
+            // If the {@link InventoryEntry#COLUMN_ITEM_PRICE} key is present,
+            // check that the price value is valid.
+            if (values.containsKey(InventoryEntry.COLUMN_ITEM_PRICE)) {
+                // Check that the price is greater than 0
+                Double price = values.getAsDouble(InventoryEntry.COLUMN_ITEM_PRICE);
+                if (price != null && price < 0) {
+                    throw new IllegalArgumentException("Inventory requires valid price");
+                }
             }
-        }
 
-
-        // If the quantity {@link InventoryEntry#COLUMN_ITEM_QUANTITY} key is present, check that it's greater than or equal to 0
-        if (values.containsKey(InventoryEntry.COLUMN_ITEM_QUANTITY)) {
-            Integer quantity = values.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANTITY);
-            if (quantity != null && quantity < 0) {
-                throw new IllegalArgumentException("Item requires valid quantity");
+            // If the quantity {@link InventoryEntry#COLUMN_ITEM_QUANTITY} key is present, check that it's greater than or equal to 0
+            if (values.containsKey(InventoryEntry.COLUMN_ITEM_QUANTITY)) {
+                Integer quantity = values.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANTITY);
+                if (quantity != null && quantity < 0) {
+                    throw new IllegalArgumentException("Item requires valid quantity");
+                }
             }
-        }
 
-
-        // If the image {@link InventoryEntry#COLUMN_ITEM_IMAGE} key is present, check that it's not null.
-        if (values.containsKey(InventoryEntry.COLUMN_ITEM_IMAGE)) {
-            String image = values.getAsString(InventoryEntry.COLUMN_ITEM_IMAGE);
-            if (image == null) {
-                throw new IllegalArgumentException("Item requires valid image");
+            // If the image {@link InventoryEntry#COLUMN_ITEM_IMAGE} key is present, check that it's not null.
+            if (values.containsKey(InventoryEntry.COLUMN_ITEM_IMAGE)) {
+                String image = values.getAsString(InventoryEntry.COLUMN_ITEM_IMAGE);
+                if (image == null) {
+                    throw new IllegalArgumentException("Item requires valid image");
+                }
             }
-        }
 
-        // If there are no values to update, then don't try to update the database
-        if (values.size() == 0) {
-            return 0;
-        }
+            // If there are no values to update, then don't try to update the database
+            if (values.size() == 0) {
+                return 0;
+            }
+        } else return 0;
 
         // Otherwise, get writeable database to update the data
         SQLiteDatabase database = mDbHelper.getWritableDatabase();

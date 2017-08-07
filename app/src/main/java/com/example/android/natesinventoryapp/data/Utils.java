@@ -23,12 +23,13 @@ public class Utils {
 
     public static Bitmap getBitmapFromUri(Uri uri, Context mContext, ImageView imageView) {
 
-        if (uri == null || uri.toString().isEmpty())
+        if (uri == null || uri.toString().isEmpty()) {
             return null;
+        }
 
         // Get the dimensions of the View
-        int targetW = imageView.getWidth();
-        int targetH = imageView.getHeight();
+        int targetW = 120;
+        int targetH = 120;
         //targetH = (targetH / 10);
         //targetW = (targetW / 10);
 

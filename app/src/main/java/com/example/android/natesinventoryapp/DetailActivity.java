@@ -46,9 +46,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private Uri mCurrentItemUri;
     private Uri mImageUri;
     private TextView nameTextView, supplierTextView, quantityTextView, priceTextView, mTextView;
-    private String mSupplierEmail = "test@gmail.com";
+    private String mSupplierEmail = "hardkornate@gmail.com";
     private String mName = "Widget";
     private String mItemUriString = null;
+    private String mImageUriString = null;
     private Button orderButton, deleteButton;
     private ImageButton incrementButton, decrementButton;
     private ImageView mImageView;
@@ -58,6 +59,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        mCurrentItemUri = super.getIntent().getData();
 
         nameTextView = (TextView) findViewById(R.id.display_item_name);
         supplierTextView = (TextView) findViewById(R.id.display_supplier_email);
@@ -70,31 +73,42 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mTextView = (TextView) findViewById(R.id.image_uri);
         mImageView = (ImageView) findViewById(R.id.detail_image);
 
+        if (mCurrentItemUri != null) {
+            getLoaderManager().initLoader(DETAIL_INVENTORY_LOADER, null, this);
+        }
+
         mFab = (FloatingActionButton) findViewById(R.id.fabDetail);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mItemUriString = mCurrentItemUri.toString();
+                mImageUriString = mImageUri.toString();
                 Intent intent = new Intent(DetailActivity.this, EditorActivity.class);
                 intent.putExtra("URI", mItemUriString);
+                intent.putExtra("IMAGE URI", mImageUriString);
                 startActivity(intent);
             }
         });
-
-        Intent intent = getIntent();
-        mCurrentItemUri = intent.getData();
-        if(mCurrentItemUri != null) {
-            getLoaderManager().initLoader(DETAIL_INVENTORY_LOADER, null, this);
-        }
 
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        // Define a projection that specifies the columns from the table we care about.
+        String[] projection = {
+                InventoryEntry._ID,
+                InventoryEntry.COLUMN_ITEM_NAME,
+                InventoryEntry.COLUMN_ITEM_SUPPLIER,
+                InventoryEntry.COLUMN_ITEM_PRICE,
+                InventoryEntry.COLUMN_ITEM_QUANTITY,
+                InventoryEntry.COLUMN_ITEM_IMAGE
+        };
+
         return new CursorLoader(
                 this,                       // Parent activity context
-                mCurrentItemUri,         // Table to query
-                null,                       // Projection
+                mCurrentItemUri,            // Table to query
+                projection,                 // Projection
                 null,                       // Selection clause
                 null,                       // Selection arguments
                 null                        // Default sort order
@@ -134,12 +148,33 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             supplierTextView.setText(mSupplierEmail);
             priceTextView.setText(mPrice);
             quantityTextView.setText(mQuantity);
+            if (mCurrentItemUri != null) {
+                ContentValues mValues = new ContentValues();
+                if (mName != null) {
+                    mValues.put(InventoryEntry.COLUMN_ITEM_NAME, mName);
+                }
+                if (mSupplierEmail != null) {
+                    mValues.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, mSupplierEmail);
+                }
+                if (price >= 0) {
+                    mValues.put(InventoryEntry.COLUMN_ITEM_PRICE, price);
+                }
+                if (quantity >= 0) {
+                    mValues.put(InventoryEntry.COLUMN_ITEM_QUANTITY, quantity);
+                }
+                if (mImage != null) {
+                    mValues.put(InventoryEntry.COLUMN_ITEM_IMAGE, mImage);
+                }
+                getContentResolver().update(mCurrentItemUri, mValues, null, null);
+            }
 
             // Display image attached to the product
             if (mImage != null) {
                 Log.i(LOG_TAG, "Uri: " + mImage);
                 mImageUri = Uri.parse(mImage);
                 mImageView.setImageBitmap(getBitmapFromUri(mImageUri, mContext, mImageView));
+            } else {
+                Log.i(LOG_TAG, "Uri: null");
             }
 
             orderButton.setOnClickListener(new View.OnClickListener() {

@@ -1,28 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Layout for the editor -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/activity_margin"
-    tools:context=".EditorActivity">
-    <LinearLayout
-        android:id="@+id/edit_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    <TextView
+    android:fitsSystemWindows="true"
+    tools:context="com.example.android.natesinventoryapp.EditorActivity">
 
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="monospace"
-        android:gravity="center_horizontal"
-        android:text="@string/add_item"
-        android:textAppearance="?android:textAppearanceLarge"
-        android:textColor="@color/editorColorPrimary"
-        android:textStyle="bold" />
-    </LinearLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_margin"
+        tools:context=".EditorActivity">
+
+        <LinearLayout
+            android:id="@+id/edit_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:gravity="center_horizontal"
+                android:text="@string/add_item"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textColor="@color/editorColorPrimary"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
         <!-- Input fields -->
         <LinearLayout
@@ -64,20 +73,25 @@
                 android:id="@+id/item_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
             <Button
                 android:id="@+id/add_image_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ADD IMAGE"/>
+                android:text="ADD IMAGE" />
+
         </LinearLayout>
+
+    </RelativeLayout>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_control_point_white_48dp"
-        app:backgroundTint="@color/colorAccent" />
-    </RelativeLayout>
+        android:fadingEdge="horizontal|vertical"
+        app:rippleColor="@android:color/holo_green_dark"
+        app:srcCompat="@drawable/ic_save_white_48pt" />
 
+</android.support.design.widget.CoordinatorLayout>

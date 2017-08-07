@@ -122,6 +122,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         if (bundle != null) {
             mCurrentItemUri = Uri.parse(bundle.getString("URI"));
+            mImageUri = Uri.parse(bundle.getString("IMAGE URI"));
         }
 
         getLoaderManager().getLoader(EXISTING_ITEM_LOADER);
@@ -238,13 +239,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if (mCurrentItemUri == null &&
                 TextUtils.isEmpty(nameString) && TextUtils.isEmpty(supplierString) &&
                 TextUtils.isEmpty(priceString) && TextUtils.isEmpty(quantityString) && mImageItem.getDrawable() == null) {
-            // Since no fields were modified, we can return early without creating a new pet.
+            // Since no fields were modified, we can return early without creating a new item.
             // No need to create ContentValues and no need to do any ContentProvider operations.
             return;
         }
 
         // Create a ContentValues object where column names are the keys,
-        // and pet attributes from the editor are the values.
+        // and item attributes from the editor are the values.
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_ITEM_NAME, nameString);
         values.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, supplierString);

@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -27,6 +28,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     private InventoryCursorAdapter mCursorAdapter;
     private View mEmptyStateView;
     private ListView mListview;
+    private View mEmptyTextView, mEmptySubTextView;
     private FloatingActionButton fab;
 
 
@@ -49,8 +51,13 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         });
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
-        mEmptyStateView = findViewById(R.id.empty_view);
+        mEmptyStateView = findViewById(R.id.empty);
+        mEmptyTextView = findViewById(R.id.empty_title_text);
+        mEmptySubTextView = findViewById(R.id.empty_sub_title_text);
         mListview = (ListView) findViewById(R.id.list);
+        ((ViewGroup) mEmptyStateView.getParent()).removeView(mEmptyStateView);
+        ViewGroup parentGroup = (ViewGroup) mListview.getParent();
+        parentGroup.addView(mEmptyStateView);
         mListview.setEmptyView(mEmptyStateView);
 
         // Setup an Adapter to create a list item for each row of inventory data in the Cursor.
@@ -60,6 +67,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         mListview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         if (mCursorAdapter != null) {
             mListview.setVisibility((mCursorAdapter.isEmpty()) ? View.GONE : View.VISIBLE);
+            mEmptyTextView.setVisibility((mCursorAdapter.isEmpty()) ? View.VISIBLE : View.GONE);
+            mEmptySubTextView.setVisibility((mCursorAdapter.isEmpty()) ? View.VISIBLE : View.GONE);
         }
         // Setup the item click listener
         AdapterView.OnItemClickListener mDetailOnItemClickListener = new AdapterView.OnItemClickListener() {
