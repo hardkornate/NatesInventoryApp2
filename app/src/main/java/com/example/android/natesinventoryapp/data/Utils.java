@@ -26,12 +26,9 @@ public class Utils {
         if (uri == null || uri.toString().isEmpty()) {
             return null;
         }
-
         // Get the dimensions of the View
         int targetW = 120;
         int targetH = 120;
-        //targetH = (targetH / 10);
-        //targetW = (targetW / 10);
 
         InputStream input = null;
         try {
@@ -47,10 +44,8 @@ public class Utils {
 
             int photoW = bmOptions.outWidth;
             int photoH = bmOptions.outHeight;
-
             // Determine how much to scale down the image
             int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
             // Decode the image file into a Bitmap sized to fill the View
             bmOptions.inJustDecodeBounds = false;
             bmOptions.inSampleSize = scaleFactor;
@@ -81,6 +76,5 @@ public class Utils {
 
     private void Utils() {
     }
-
 }
 

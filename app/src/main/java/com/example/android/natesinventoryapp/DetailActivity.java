@@ -89,7 +89,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 startActivity(intent);
             }
         });
-
     }
 
     @Override
@@ -189,7 +188,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 public void onClick(View view) {
                     confirmDeleteItem();
                 }
-
             });
 
             incrementButton.setOnClickListener(new View.OnClickListener() {
@@ -207,7 +205,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 }
 
             });
-
         }
     }
 
@@ -239,10 +236,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
-
     @Override
     public void onLoaderReset(Loader loader) {
-
     }
 
     private void adjustInventory(Uri itemUri, int mQuantity) {
@@ -266,41 +261,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         finish();
     }
 
-    /**   private void sendEmail() {
-        if (mCurrentItemUri != null) {
-            String subject = "URI Example";
-            String stream = "Hello! \n"
-                    + "Uri example" + ".\n"
-                    + "Uri: " + mCurrentItemUri.toString() + "\n";
-
-            Intent shareIntent = ShareCompat.IntentBuilder.from(this)
-                    .setStream(mCurrentItemUri)
-                    .setSubject(subject)
-                    .setText(stream)
-                    .getIntent();
-
-            // Provide read access
-            shareIntent.setData(mCurrentItemUri);
-            shareIntent.setType("message/rfc822");
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-     shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-
-            startActivityForResult(Intent.createChooser(shareIntent, "Share with"), SEND_MAIL_REQUEST);
-
-        } else {
-            Snackbar.make(mFab, "Image not selected", Snackbar.LENGTH_LONG)
-                    .setAction("Select", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            openImageSelector();
-                        }
-                    }).show();
-        }
-    }
-
-
-     * Method to ask confirmation for deleting a product
-     */
     private void confirmDeleteItem() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirm_delete));
@@ -317,15 +277,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 }
             }
         });
-
         // Create and show the AlertDialog
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
 
-    /**
-     * Method to delete the product
-     */
     private void deleteItem() {
 
         // Only perform the delete if this is an existing product
@@ -340,9 +296,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 Toast.makeText(this, getString(R.string.delete_successful), Toast.LENGTH_SHORT).show();
             }
         }
-
         // Close the activity
         finish();
     }
-
 }

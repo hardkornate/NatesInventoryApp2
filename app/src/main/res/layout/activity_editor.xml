@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Layout for the editor -->
 
+<!-- Layout for the editor -->
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -67,7 +67,7 @@
                 android:id="@+id/edit_item_initial_quantity"
                 style="@style/EditorFieldStyle"
                 android:hint="@string/hint_item_initial_quantity"
-                android:inputType="textEmailAddress" />
+                android:inputType="number" />
 
             <ImageView
                 android:id="@+id/item_image"

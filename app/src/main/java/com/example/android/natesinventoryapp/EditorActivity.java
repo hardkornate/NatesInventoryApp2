@@ -37,17 +37,14 @@ import static com.example.android.natesinventoryapp.data.Utils.getBitmapFromUri;
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LOG_TAG = InventoryEntry.class.getSimpleName();
-
     /**
      * Code for image request
      */
     private static final int IMAGE_REQUEST_CODE = 0;
-
     /**
      * Image state URI
      */
     private static final String STATE_IMAGE_URI = "STATE_IMAGE_URI";
-
     /**
      * Identifier for the item data loader
      */
@@ -127,7 +124,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         getLoaderManager().getLoader(EXISTING_ITEM_LOADER);
 
-
         // Find all relevant views that we will need to read user input from
         mNameEditText = (EditText) findViewById(R.id.edit_item_name);
         mSupplierEditText = (EditText) findViewById(R.id.edit_item_supplier_email);
@@ -154,7 +150,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mSupplierEditText.setOnTouchListener(mTouchListener);
         mPriceEditText.setOnTouchListener(mTouchListener);
         mQuantityEditText.setOnTouchListener(mTouchListener);
-        // Setup FAB to open EditorActivity
+        // Setup FAB to save EditorActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab2);
         fab.setOnClickListener(new View.OnClickListener()
 
@@ -266,7 +262,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                         Toast.LENGTH_SHORT).show();
                 finish();
             }
-
     }
 
     @Override
@@ -359,14 +354,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             if (image != null) {
                 mImageUri = Uri.parse(image);
                 mImageItem.setImageBitmap(getBitmapFromUri(mImageUri, mContext, mImageItem));
-
             }
         }
     }
 
     @Override
     public void onLoaderReset(Loader loader) {
-
     }
 
     @Override

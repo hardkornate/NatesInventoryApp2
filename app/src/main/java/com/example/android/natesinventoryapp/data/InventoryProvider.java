@@ -146,7 +146,7 @@ public class InventoryProvider extends ContentProvider {
 
         // If the supplier is provided, check that it's a valid URL
         String supplier = values.getAsString(InventoryEntry.COLUMN_ITEM_SUPPLIER);
-        if (!isValidEmail(supplier)) {
+        if (!isValidEmail(supplier) || !Patterns.WEB_URL.matcher(supplier).matches()) {
             throw new IllegalArgumentException("Supplier requires a valid email address");
         }
 

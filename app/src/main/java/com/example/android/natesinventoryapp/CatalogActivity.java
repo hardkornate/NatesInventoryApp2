@@ -17,11 +17,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEntry;
-
 /**
  * Displays list of inventory items that were entered and stored in the app.
  */
-
 public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int INVENTORY_LOADER = 0;
@@ -31,15 +29,10 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     private View mEmptyTextView, mEmptySubTextView;
     private FloatingActionButton fab;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
-
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-
         // Setup FAB to open EditorActivity
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -49,7 +42,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 startActivity(intent);
             }
         });
-
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         mEmptyStateView = findViewById(R.id.empty);
         mEmptyTextView = findViewById(R.id.empty_title_text);
@@ -59,7 +51,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         ViewGroup parentGroup = (ViewGroup) mListview.getParent();
         parentGroup.addView(mEmptyStateView);
         mListview.setEmptyView(mEmptyStateView);
-
         // Setup an Adapter to create a list item for each row of inventory data in the Cursor.
         // There is no inventory data yet (until the loader finishes) so pass in null for the Cursor.
         mCursorAdapter = new InventoryCursorAdapter(this);
@@ -93,10 +84,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         };
 
         mListview.setOnItemClickListener(mDetailOnItemClickListener);
-
         // Kick off the loader
         getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
-
     }
     @Override
     public void onContentChanged() {
@@ -105,7 +94,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             mListview.setVisibility(mCursorAdapter.isEmpty() ? View.GONE : View.VISIBLE);
         }
     }
-
     /**
      * Helper method to insert hardcoded item data into the database. For debugging purposes only.
      */
@@ -146,7 +134,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 null);                  // Default sort order
     }
 
-
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         // Update {@link InventoryCursorAdapter} with this new cursor containing updated pet data
@@ -158,6 +145,4 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         // Callback called when the data needs to be deleted
         mCursorAdapter.swapCursor(null);
     }
-
-
 }

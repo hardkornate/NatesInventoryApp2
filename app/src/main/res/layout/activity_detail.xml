@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Detail Layout -->
 
+<!-- Detail Layout -->
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -71,6 +71,7 @@
             android:layout_below="@id/display_fields"
             android:layout_gravity="center_horizontal"
             android:padding="@dimen/activity_margin">
+
             <!--increment button -->
             <ImageButton
                 android:id="@+id/increment"
@@ -100,6 +101,7 @@
                         android:padding="@dimen/activity_margin"
                         android:text="@string/current_quantity"
                         android:textAlignment="center" />
+
                     <!-- Quantity field -->
                     <TextView
                         android:id="@+id/display_item_quantity"
@@ -107,6 +109,7 @@
                         android:padding="@dimen/activity_margin"
                         android:textAlignment="center" />
                 </LinearLayout>
+
                 <!--delete item button -->
                 <Button
                     android:id="@+id/order_item_button"
@@ -138,6 +141,7 @@
                     android:focusable="false"
                     android:scaleType="fitXY" />
             </LinearLayout>
+
             <!--decrement button -->
             <ImageButton
                 android:id="@+id/decrement"
@@ -153,7 +157,6 @@
         </RelativeLayout>
 
     </RelativeLayout>
-
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabDetail"
