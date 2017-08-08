@@ -32,4 +32,10 @@
     <string name="exception_file_not_found">File not found.</string>
     <string name="URI_TO_EDIT">URI for editor activity</string>
     <string name="exception_input_output_error">Input output error</string>
+    <string name="name_failed">Please enter the item name.</string>
+    <string name="supplier_failed">Please enter the supplier name.</string>
+    <string name="price_failed">Please enter the item price.</string>
+    <string name="quantity_failed">Please enter the item quantity.</string>
+    <string name="image_failed">Please supply an image for the item.</string>
+    <string name="invalid_email">The email you entered is invalid.</string>
 </resources>

@@ -63,7 +63,7 @@ public class InventoryProvider extends ContentProvider {
     /** Database helper object */
     private InventoryDbHelper mDbHelper;
 
-    private static boolean isValidEmail(CharSequence target) {
+    public static boolean isValidEmail(CharSequence target) {
         return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());
     }
 
@@ -140,7 +140,7 @@ public class InventoryProvider extends ContentProvider {
     private Uri insertItem(Uri uri, ContentValues values) {
 
         // Check that the name is not null
-        String name = values.getAsString(InventoryEntry.COLUMN_ITEM_NAME);
+        /**   String name = values.getAsString(InventoryEntry.COLUMN_ITEM_NAME);
         if (name == null) {
             throw new IllegalArgumentException("Inventory item requires a name");
         }
@@ -167,7 +167,7 @@ public class InventoryProvider extends ContentProvider {
         int image = values.getAsInteger(InventoryEntry.COLUMN_ITEM_QUANTITY);
         if (image < 0) {
             throw new IllegalArgumentException("Item requires valid quantity");
-        }
+         }**/
 
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();

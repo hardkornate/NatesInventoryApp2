@@ -17,7 +17,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -30,7 +29,9 @@ import com.example.android.natesinventoryapp.data.InventoryContract.InventoryEnt
 import com.example.android.natesinventoryapp.data.Utils;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
 
+import static com.example.android.natesinventoryapp.data.InventoryProvider.isValidEmail;
 import static com.example.android.natesinventoryapp.data.Utils.getBitmapFromUri;
 
 
@@ -100,10 +101,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      * Button for adding image
      */
     private Button mButtonAddImage;
-    /**
-     * Path for the Image
-     */
-    private String imagePath;
 
     public EditorActivity() {
         mCurrentItemUri = null;
@@ -114,13 +111,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
 
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
+        //Intent intent = getIntent();
+        //Bundle bundle = intent.getExtras();
 
-        if (bundle != null) {
-            mCurrentItemUri = Uri.parse(bundle.getString("URI"));
-            mImageUri = Uri.parse(bundle.getString("IMAGE URI"));
-        }
+        //if (bundle != null) {
+        //    mCurrentItemUri = Uri.parse(bundle.getString("URI"));
+        //    mImageUri = Uri.parse(bundle.getString("IMAGE URI"));
+        //}
 
         getLoaderManager().getLoader(EXISTING_ITEM_LOADER);
 
@@ -167,7 +164,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         super.onRestoreInstanceState(savedInstanceState);
 
         if (savedInstanceState.containsKey(STATE_IMAGE_URI) &&
-                !savedInstanceState.getString(STATE_IMAGE_URI).equals("")) {
+                !savedInstanceState.getString("").equals(STATE_IMAGE_URI)) {
             mImageUri = Uri.parse(savedInstanceState.getString(STATE_IMAGE_URI));
 
             ViewTreeObserver viewTreeObserver = mImageItem.getViewTreeObserver();
@@ -224,33 +221,62 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private void saveItem() {
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
-        String nameString = mNameEditText.getText().toString().trim();
-        String supplierString = mSupplierEditText.getText().toString().trim();
-        String priceString = mPriceEditText.getText().toString().trim();
-        String quantityString = mQuantityEditText.getText().toString().trim();
-        String mImagePath = mImageUri.toString().trim();
+        //  String nameString = mNameEditText.getText().toString().trim();
+        //  String supplierString = mSupplierEditText.getText().toString().trim();
+        // String priceString = mPriceEditText.getText().toString().trim();
+        // String quantityString = mQuantityEditText.getText().toString().trim();
+        // String mImagePath = mImageUri.toString().trim();
 
         // Check if this is supposed to be a new item
         // and check if all the fields in the editor are blank
-        if (mCurrentItemUri == null &&
-                TextUtils.isEmpty(nameString) && TextUtils.isEmpty(supplierString) &&
-                TextUtils.isEmpty(priceString) && TextUtils.isEmpty(quantityString) && mImageItem.getDrawable() == null) {
+        // if (mCurrentItemUri == null &&
+        //       TextUtils.isEmpty(nameString) && TextUtils.isEmpty(supplierString) &&
+        //      TextUtils.isEmpty(priceString) && TextUtils.isEmpty(quantityString) && mImageItem.getDrawable() == null) {
             // Since no fields were modified, we can return early without creating a new item.
             // No need to create ContentValues and no need to do any ContentProvider operations.
+        //return;
+        //} else {
+        ContentValues values = new ContentValues();
+        if (!mNameEditText.getText().toString().equals("")) {
+            String nameString = mNameEditText.getText().toString().trim();
+            values.put(InventoryEntry.COLUMN_ITEM_NAME, nameString);
+        } else {
+            Toast.makeText(this, getString(R.string.name_failed), Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Create a ContentValues object where column names are the keys,
-        // and item attributes from the editor are the values.
-        ContentValues values = new ContentValues();
-        values.put(InventoryEntry.COLUMN_ITEM_NAME, nameString);
-        values.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, supplierString);
-        values.put(InventoryEntry.COLUMN_ITEM_PRICE, priceString);
-        values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, quantityString);
-        values.put(InventoryEntry.COLUMN_ITEM_IMAGE, mImagePath);
-       
+        if (Objects.equals(mSupplierEditText.getText().toString(), "")) {
+            Toast.makeText(this, getString(R.string.supplier_failed), Toast.LENGTH_SHORT).show();
+            return;
+        } else if (!isValidEmail(mSupplierEditText.getText().toString())) {
+            Toast.makeText(this, getString(R.string.invalid_email), Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            String supplierString = mSupplierEditText.getText().toString().trim();
+            values.put(InventoryEntry.COLUMN_ITEM_SUPPLIER, supplierString);
+        }
+        if (Objects.equals(mPriceEditText.getText().toString(), "")) {
+            Toast.makeText(this, getString(R.string.price_failed), Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            String priceString = mPriceEditText.getText().toString().trim();
+            values.put(InventoryEntry.COLUMN_ITEM_PRICE, priceString);
+        }
+        if (Objects.equals(mQuantityEditText.getText().toString(), "")) {
+            Toast.makeText(this, getString(R.string.quantity_failed), Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            String quantityString = mQuantityEditText.getText().toString().trim();
+            values.put(InventoryEntry.COLUMN_ITEM_QUANTITY, quantityString);
+        }
+        if (mImageUri != null) {
+            String mImagePath = mImageUri.toString().trim();
+            values.put(InventoryEntry.COLUMN_ITEM_IMAGE, mImagePath);
+        } else {
+            Toast.makeText(this, getString(R.string.image_failed), Toast.LENGTH_SHORT).show();
+            return;
+        }
             mCurrentItemUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
-
+        //}
             // Show a toast message depending on whether or not the insertion was successful.
             if (mCurrentItemUri == null) {
                 // If the new content URI is null, then there was an error with insertion.
