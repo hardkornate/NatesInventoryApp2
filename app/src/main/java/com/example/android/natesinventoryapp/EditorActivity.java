@@ -164,7 +164,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         super.onRestoreInstanceState(savedInstanceState);
 
         if (savedInstanceState.containsKey(STATE_IMAGE_URI) &&
-                !savedInstanceState.getString("").equals(STATE_IMAGE_URI)) {
+                !savedInstanceState.getString(STATE_IMAGE_URI).equals("")) {
             mImageUri = Uri.parse(savedInstanceState.getString(STATE_IMAGE_URI));
 
             ViewTreeObserver viewTreeObserver = mImageItem.getViewTreeObserver();
